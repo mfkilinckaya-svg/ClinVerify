@@ -1,5 +1,7 @@
 # ClinVerify
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21255695.svg)](https://doi.org/10.5281/zenodo.21255695)
+
 **ClinVerify** is an open-source, single-file (HTML/CSS/JS) clinical laboratory
 verification tool. It runs entirely in the browser — no server, no install,
 no internet connection required after loading the page — and is designed for
@@ -46,7 +48,9 @@ CSV/XLSX import (drag-and-drop supported).
 ## Citation
 
 If you use ClinVerify in academic work, please cite it using the metadata in
-[`CITATION.cff`](CITATION.cff).
+[`CITATION.cff`](CITATION.cff), or via its DOI:
+
+> Kilinckaya, M. F. (2026). ClinVerify (v1.0.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.21255695
 
 ## License
 

@@ -9,6 +9,11 @@ authors:
 license: MIT
 version: 1.0.0
 date-released: "2026-07-08"
+doi: 10.5281/zenodo.21255695
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.21255695
+    description: "Archived snapshot of version 1.0.0"
 repository-code: "https://github.com/mfkilinckaya-svg/ClinVerify"
 keywords:
   - clinical chemistry
