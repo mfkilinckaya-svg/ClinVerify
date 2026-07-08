@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "ClinVerify: An Open-Source Single-File Tool for Clinical Laboratory Method Verification"
+type: software
+authors:
+  - family-names: Kilinckaya
+    given-names: Muhammed F.
+    affiliation: "Helse Møre og Romsdal (HMR), Norway"
+license: MIT
+version: 1.0.0
+date-released: "2026-07-08"
+repository-code: "https://github.com/mfkilinckaya-svg/ClinVerify"
+keywords:
+  - clinical chemistry
+  - laboratory verification
+  - CLSI EP15-A3
+  - CLSI EP09c
+  - CLSI EP28-A3c
+  - method comparison
+  - reference intervals
