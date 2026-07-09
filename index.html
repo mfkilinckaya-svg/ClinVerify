@@ -487,11 +487,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;font-size:14px;color:var(--gray-800
           <div style="font-size:11px;color:var(--gray-500);margin-bottom:12px">
             Grand mean (x̄) is auto-filled from M2 module. Target value from kit insert or or lab calibration.
           </div>
-          <div class="cv-dropzone" data-cv-upload="bias" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:12px">
-            <button class="btn" style="background:#fff;border:1px solid #b45309;color:#92400e;font-size:12px;padding:6px 12px" onclick="cvDownloadBiasTemplate()">⬇️ Download Template (CSV)</button>
-            <button class="btn" style="background:#b45309;color:#fff;font-size:12px;padding:6px 12px" onclick="cvUploadBias()">📤 Upload Excel / CSV</button>
-            <span style="font-size:11px;color:#92400e">Same IQC file as M2 — reads Level + Value, computes the mean per level. Then enter the Target (assigned/kit value) for each level. (Optional Target column is auto-read.) &nbsp;·&nbsp; <b>📎 or drag &amp; drop a file here</b></span>
-          </div>
           <div id="bias-iqc-levels"></div>
           <div class="btn-row" style="margin-top:8px">
             <button class="btn btn-add" onclick="biasIQC_addLevel()">+ Add Level</button>
@@ -934,10 +929,10 @@ function buildM1FormHTML() {
       placeholder="Paste here (Ctrl+V)&#10;Example (2 levels x 10 reps): 2 columns or 20 rows"
       style="width:100%;border:1px solid #86efac;border-radius:6px;padding:8px;font-size:12px;font-family:monospace;resize:vertical;background:#fff"
       onpaste="handleM1BulkPaste(event)"></textarea>
-    <div class="cv-dropzone" data-cv-upload="m1" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center">
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center">
       <button class="btn" style="background:#fff;border:1px solid #16a34a;color:#166534;font-size:12px;padding:6px 12px" onclick="cvDownloadM1Template()">⬇️ Download Template (CSV)</button>
       <button class="btn" style="background:#16a34a;color:#fff;font-size:12px;padding:6px 12px" onclick="cvUploadM1()">📤 Upload Excel / CSV</button>
-      <span style="font-size:11px;color:#166534">Columns: Sample No · Date · Analyte · Unit · Instrument · Material · Level · Value &nbsp;·&nbsp; <b>📎 or drag &amp; drop a file here</b></span>
+      <span style="font-size:11px;color:#166534">Columns: Sample No · Date · Analyte · Unit · Instrument · Material · Level · Value</span>
     </div>
   </div>
 
@@ -1087,10 +1082,10 @@ function buildM2FormHTML() {
       style="width:100%;border:1px solid #93c5fd;border-radius:6px;padding:8px;font-size:12px;font-family:monospace;resize:vertical;background:#fff"
       onpaste="handleM2BulkPaste(event)" oninput="handleM2BulkInput(event)"></textarea>
     <div id="m2-bulk-status" style="margin-top:8px;font-size:12px"></div>
-    <div class="cv-dropzone" data-cv-upload="m2" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center;border-top:1px solid #dbeafe;padding-top:10px">
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center;border-top:1px solid #dbeafe;padding-top:10px">
       <button class="btn" style="background:#fff;border:1px solid #1e40af;color:#1e3a8a;font-size:12px;padding:6px 12px" onclick="cvDownloadM2Template()">⬇️ Download Template (CSV)</button>
       <button class="btn" style="background:#1e40af;color:#fff;font-size:12px;padding:6px 12px" onclick="cvUploadM2()">📤 Upload Excel / CSV</button>
-      <span style="font-size:11px;color:#1e3a8a">Columns: Sample No · Date · Analyte · Unit · Instrument · Material · Level · Day · Replicate · Value &nbsp;·&nbsp; <b>📎 or drag &amp; drop a file here</b></span>
+      <span style="font-size:11px;color:#1e3a8a">Columns: Sample No · Date · Analyte · Unit · Instrument · Material · Level · Day · Replicate · Value</span>
     </div>
   </div>
 
@@ -1296,11 +1291,11 @@ const ANALYTE_SYNONYMS = {
   'lymph%':['lenfosit%','lymphocyte%','lymfocytt%','lymph%'],
   'mono#':['monosit','monocyte','monocytes','monocytt','mono','monocytter','monositler'],
   'mono%':['monosit%','monocyte%','monocytt%','mono%'],
-  'eo#':['eozinofil','eosinophil','eosinophils','eosinofil','eo','eosinofile','eosinofiler','eosinophile','eosinophile#','eosinophils#'],
+  'eo#':['eozinofil','eosinophil','eosinophils','eosinofil','eo','eosinofile','eosinofiler'],
   'eo%':['eozinofil%','eosinophil%','eosinofil%','eo%'],
-  'baso#':['bazofil','basophil','basophils','basofil','baso','basofile','basofiler','basophile','basophile#','basophils#'],
+  'baso#':['bazofil','basophil','basophils','basofil','baso','basofile','basofiler'],
   'baso%':['bazofil%','basophil%','basofil%','baso%'],
-  'ret#':['retikulosit','reticulocyte','reticulocytes','retic#','ret','retikulocytter','retikulocyte','retikulocytt','reticulocyte#'],
+  'ret#':['retikulosit','reticulocyte','reticulocytes','retic#','ret','retikulocytter'],
   'ret%':['retikulosit%','reticulocyte%','retic%','ret%'],
   'ig#':['immat\u00fcr gran\u00fclosit','immature granulocyte'],
   'ig%':['immat\u00fcr gran\u00fclosit%','immature granulocyte%'],
@@ -1308,11 +1303,7 @@ const ANALYTE_SYNONYMS = {
   'rdw-cv':['rdw-cv'],
   'mpv':['mean platelet volume'],
   'ipf':['immature platelet fraction'],
-  'ret-he':['reticulocyte hemoglobin equivalent','rhe','reticulocyte-hb','retikulocyt-hb','ret-hb','ret hb','reticulocyte hb','retic-hb'],
-  // ── ESR / NRBC / Albumin (added in alias audit 07.07.2026)
-  'esr':['esr','erythrocyte sedimentation rate','sedimentation rate','senkning','senkningsreaksjon','blodsenkning','sr','sedim','eritrosit sedimentasyon hızı','sedimentasyon','sänka'],
-  'nrbc':['nrbc','nucleated red blood cell','nucleated rbc','nrbc#','normoblast','kernede erytrocytter','çekirdekli eritrosit','nrbc%'],
-  'albumin':['albumin','albümin','s-albumin','p-albumin','serumalbumin','serum albumin','alb'],
+  'ret-he':['reticulocyte hemoglobin equivalent','rhe'],
   'hba1c (ngsp)':['hemoglobin a1c ngsp','haemoglobin a1c ngsp','hba1c ngsp','glycated hemoglobin ngsp','hba1c(ngsp)'],
   'hba1c':['haemoglobin a1c','hemoglobin a1c','glycated hemoglobin','glycohaemoglobin','glycohemoglobin','a1c'],
   // ── Siemens Atellica NEPH (Protein)
@@ -3599,7 +3590,7 @@ function calcM2Level(lv,unit,nSamTotal,eflmLevel){
   <div class="result-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin:12px 0">
     <div class="result-box" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center"><div class="label">N</div><div class="value">${N}</div></div>
     <div class="result-box" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center"><div class="label">Mean (x̄)</div><div class="value">${mean.toFixed(3)}</div><div class="ci">${unit}</div></div>
-    <div class="result-box" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center"><div class="label">SD</div><div class="value">${sd.toFixed(3)}</div><div class="ci">${unit}</div></div>
+    <div class="result-box" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center"><div class="label">SD (s<sub>WL</sub>)</div><div class="value">${sWL_val.toFixed(3)}</div><div class="ci">${unit}</div></div>
     <div class="result-box" style="border-color:#93c5fd;background:var(--blue-light)"><div class="label">CV% (sWL)</div><div class="value">${cvResult.toFixed(2)}%</div><div class="ci">%95 CI: ${cvLow.toFixed(2)}–${cvHigh.toFixed(2)}%</div></div>
     ${!isNaN(goals.firma)?`<div class="result-box" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;text-align:center"><div class="label">σWL (Manufacturer)</div><div class="value">${goals.firma.toFixed(2)}%</div><div class="ci">Target</div></div>`:''}
     ${!isNaN(goals.eflm)?`<div class="result-box" style="border-color:#c4b5fd;background:#f0edff"><div class="label">CVA (EFLM)</div><div class="value">${goals.eflm.toFixed(2)}%</div><div class="ci">${eflmLevelLabel}</div></div>`:''}
@@ -5921,10 +5912,10 @@ const ep09BodyHTML = `
         <button class="btn btn-primary" onclick="ep09_importPaste()">Import Data</button>
         <button class="btn btn-secondary" onclick="ep09_clearAll()">Clear</button>
       </div>
-      <div class="cv-dropzone" data-cv-upload="ep09" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--gray-200);padding-top:8px">
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--gray-200);padding-top:8px">
         <button class="btn" style="background:#fff;border:1px solid #1e40af;color:#1e3a8a;font-size:12px;padding:6px 12px" onclick="cvDownloadEP09Template()">⬇️ Download Template (CSV)</button>
         <button class="btn" style="background:#1e40af;color:#fff;font-size:12px;padding:6px 12px" onclick="cvUploadEP09()">📤 Upload Excel / CSV</button>
-        <span style="font-size:11px;color:#1e3a8a">Columns: Sample No · Analyte · Unit · Comparator Method · Candidate Method · X (Comparator) · Y (Candidate) &nbsp;·&nbsp; <b>📎 or drag &amp; drop a file here</b></span>
+        <span style="font-size:11px;color:#1e3a8a">Columns: Sample No · Analyte · Unit · Comparator Method · Candidate Method · X (Comparator) · Y (Candidate)</span>
       </div>
     </div>
 
@@ -6036,6 +6027,15 @@ const mentorBodyHTML = `
         <input type="number" id="mentor-bias-spec" step="0.1" placeholder="e.g. 5 (auto from EFLM)" oninput="this._userSet=true">
       </div>
       <div class="form-group">
+        <label>Analytical decision level (y)
+          <span title="Enter any value you would see adjusted according to the correction function, e.g. Upper and lower reference limits (Kallner Mentor v1.35)" style="cursor:help;color:var(--gray-400);font-size:11px;font-weight:400">&nbsp;ⓘ</span>
+        </label>
+        <input type="number" id="mentor-decision-y" step="any" placeholder="e.g. 90 (within calibration range)">
+        <div style="font-size:10px;color:var(--gray-500);margin-top:3px;line-height:1.3">
+          Concentration at which recalibration reliability is evaluated. If blank, decision-level uncertainty is not computed.
+        </div>
+      </div>
+      <div class="form-group">
         <label>EFLM BV Goal <span style="font-size:10px;color:var(--gray-400)">(auto-filled)</span></label>
         <select id="mentor-eflm-level" onchange="mentor_recalcEFLM()" style="margin-bottom:4px">
           <option value="desirable">Desirable</option>
@@ -6051,10 +6051,10 @@ const mentorBodyHTML = `
   <div class="card">
     <div class="card-title">🔬 Measurements</div>
 
-    <div class="cv-dropzone" data-cv-upload="mentor" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:12px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:12px">
       <button class="btn" style="background:#fff;border:1px solid #7c3aed;color:#6d28d9;font-size:12px;padding:6px 12px" onclick="cvDownloadMentorTemplate()">⬇️ Download Template (CSV)</button>
       <button class="btn" style="background:#7c3aed;color:#fff;font-size:12px;padding:6px 12px" onclick="cvUploadMentor()">📤 Upload Excel / CSV</button>
-      <span style="font-size:11px;color:#6d28d9">One file for both instruments — Columns: Sample No · Analyte · Unit · Reference Instrument · Candidate Instrument · Method (Reference/Candidate) · Level (Low/High) · Value &nbsp;·&nbsp; <b>📎 or drag &amp; drop a file here</b></span>
+      <span style="font-size:11px;color:#6d28d9">One file for both instruments — Columns: Sample No · Analyte · Unit · Reference Instrument · Candidate Instrument · Method (Reference/Candidate) · Level (Low/High) · Value</span>
     </div>
 
     <!-- Reference X -->
@@ -6165,11 +6165,6 @@ const mentorBodyHTML = `
 const riBodyHTML = `
 <div class="card">
   <div class="card-title">📋 Analyte & Study Information</div>
-  <div class="cv-dropzone" data-cv-upload="ri" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:12px">
-    <button class="btn" style="background:#fff;border:1px solid #be185d;color:#9d174d;font-size:12px;padding:6px 12px" onclick="cvDownloadRITemplate()">⬇️ Download Template (CSV)</button>
-    <button class="btn" style="background:#be185d;color:#fff;font-size:12px;padding:6px 12px" onclick="cvUploadRI()">📤 Upload Excel / CSV</button>
-    <span style="font-size:11px;color:#9d174d">One measurement per row: Sample No · Analyte · Unit · Gender · RI Lower · RI Upper · Round (1=reference, 2=validation) · Value &nbsp;·&nbsp; <b>📎 or drag &amp; drop a file here</b></span>
-  </div>
   <div class="form-row">
     <div class="form-group"><label>Analyte Name</label><input type="text" id="ri-analyte" placeholder="e.g. Calcium" oninput="riAnalyteInput()"></div>
     <div class="form-group" id="ri-sampletype-picker" style="display:none;">
@@ -8877,42 +8872,50 @@ function inter_loadCreatinineDemo() {
 }
 
 function mentor_loadCreatinineDemo() {
-  // Mentor: C703-1 (Reference) vs c501 (Emergency)
-  // Calibrator points: Low (n=3), High (n=3)
+  // Mentor: C703-1 (Reference/Mentor) vs Emergency (Candidate)
+  // ORIGINAL Kallner Mentor v1.35 spreadsheet dataset (n=10 per level, per instrument)
+  // Ref: A. Kallner, "Split-sample method for lab intercomparison" (2013)
+  // Decision level y = 4 matches Kallner's Q4 default value.
   mentor_clearAll();
   setTimeout(() => {
     const analyte = document.getElementById('mentor-analyte');   if (analyte) analyte.value = 'Creatinine';
-    // Reset _userSet so EFLM auto-fills allowable bias
     const bsEl = document.getElementById('mentor-bias-spec'); if (bsEl) { bsEl._userSet = false; }
     if (analyte) analyte.dispatchEvent(new Event('input'));
     const unit    = document.getElementById('mentor-unit');       if (unit)    unit.value    = 'µmol/L';
-    const refI    = document.getElementById('mentor-ref-instr'); if (refI)    refI.value    = 'C703-1 (Reference)';
-    const newI    = document.getElementById('mentor-new-instr'); if (newI)    newI.value    = 'c501 (Emergency)';
+    const refI    = document.getElementById('mentor-ref-instr'); if (refI)    refI.value    = 'C703-1 (Mentor)';
+    const newI    = document.getElementById('mentor-new-instr'); if (newI)    newI.value    = 'Emergency (Candidate)';
 
-    // Set n=3 for calibrator reps
-    const nEl = document.getElementById('mentor-n'); if (nEl) { nEl.value = 3; nEl.dispatchEvent(new Event('change')); }
+    // Set n=10 per level per instrument (Kallner's original design)
+    const nrRef = document.getElementById('mentor-nreps-ref'); if (nrRef) nrRef.value = 10;
+    const nrNew = document.getElementById('mentor-nreps-new'); if (nrNew) nrNew.value = 10;
 
-    setTimeout(() => {
-      // Calibrator points
-      [[1,90.3],[2,90.2],[3,88.0]].forEach(([i,v]) => {
-        const el = document.getElementById('mentor-ref-low-' + i); if (el) el.value = v;
-      });
-      [[1,92.3],[2,93.1],[3,93.0]].forEach(([i,v]) => {
-        const el = document.getElementById('mentor-new-low-' + i); if (el) el.value = v;
-      });
-      [[1,340.2],[2,340.4],[3,341.2]].forEach(([i,v]) => {
-        const el = document.getElementById('mentor-ref-high-' + i); if (el) el.value = v;
-      });
-      [[1,346.1],[2,347.4],[3,345.6]].forEach(([i,v]) => {
-        const el = document.getElementById('mentor-new-high-' + i); if (el) el.value = v;
-      });
+    // Synchronously rebuild inputs before populating (avoids DOM race)
+    if (typeof mentor_buildInputs === 'function') mentor_buildInputs();
 
-      // EFLM bias limit for Mentor evaluation
-      const baEl = document.getElementById('mentor-bias-limit'); if (baEl) baEl.value = 4.10;
+    // Kallner original data — full precision (Excel-stored, not display-rounded)
+    const data = {
+      'ref-low':  [90.2, 90.2, 88.2, 89.5, 90.0, 89.9, 88.9, 89.1, 89.8, 88.7],
+      'ref-high': [340.6, 340.0, 341.1, 341.5, 342.6, 340.8, 341.9, 338.4, 340.7, 341.0],
+      'new-low':  [92.2, 90.4, 92.5, 90.8, 92.5, 94.1, 94.1, 93.9, 90.3, 93.1],
+      'new-high': [346.8, 348.9, 347.3, 348.9, 349.0, 346.3, 347.4, 347.5, 347.3, 346.5]
+    };
+    Object.entries(data).forEach(([key, vals]) => {
+      vals.forEach((v, i) => {
+        const el = document.getElementById('mentor-' + key + '-' + (i+1)); if (el) el.value = v;
+      });
+      if (typeof mentor_updateStats === 'function') mentor_updateStats(key);
+    });
 
-      mentor_runAnalysis();
-      if (typeof showToast === 'function') showToast('Creatinine demo loaded — Mentor Two-Point Regression');
-    }, 200);
+    // Kallner defaults: Qual. Spec. 4.1%, decision-level y = 4 (matches Kallner's Q4)
+    if (bsEl) { bsEl.value = 4.1; bsEl._userSet = true; }
+    const dyEl = document.getElementById('mentor-decision-y'); if (dyEl) dyEl.value = 4;
+
+    // Update UI labels
+    const refLbl = document.getElementById('mentor-ref-lbl'); if (refLbl) refLbl.textContent = 'C703-1 (Mentor)';
+    const newLbl = document.getElementById('mentor-new-lbl'); if (newLbl) newLbl.textContent = 'Emergency (Candidate)';
+
+    mentor_runAnalysis();
+    if (typeof showToast === 'function') showToast('Creatinine demo loaded (Kallner Mentor v1.35, n=10) — decision level y = 4');
   }, 100);
 }
 
@@ -10106,11 +10109,39 @@ function mentor_runAnalysis() {
     const z = (y - yLo) / (yHi - yLo);
     return Math.sqrt((SDy**2 + (y*CVy/100)**2)/b**2 + ((1-z)*slo)**2 + (z*shi)**2);
   }
-  const u_recal_lo = mentorUx(yLo);
+  // Recalibration uncertainty per Kallner's Mentor spreadsheet = uncertainty of
+  // the two-point recalibration LINE at each level (slo/shi). This is validated to
+  // match Anders Kallner's official spreadsheet exactly (u_recal = 0.195 → k=2
+  // expanded = 0.39 for the Folat worked example). The earlier mentorUx() also
+  // added a single future-measurement term (SDy²/b²) that Kallner's sheet does
+  // NOT include, which roughly doubled U_rel; that term is dropped here.
+  const u_recal_lo = slo;
   const U_rel_lo = k * u_recal_lo / xLo * 100; // as %
 
-  const u_recal_hi = mentorUx(yHi);
+  const u_recal_hi = shi;
   const U_rel_hi = k * u_recal_hi / xHi * 100;
+
+  // === Kallner Decision-Level Uncertainty (Calc!AP3 / Results!T4) ===
+  // If user provides an analytical decision level y (Kallner Q4 "Crit value Uncorr"),
+  // compute recalibrated value x, uncertainty ux, and relative uncertainty U_rel at y.
+  // Matches Kallner Mentor v1.35 Excel formulas exactly.
+  const decisionY_el = document.getElementById('mentor-decision-y');
+  const decisionY_raw = decisionY_el ? decisionY_el.value.trim() : '';
+  const decisionY = decisionY_raw === '' ? NaN : parseFloat(decisionY_raw);
+  let decisionBlock = null;
+  if (!isNaN(decisionY)) {
+    const z_dec = (decisionY - yLo) / (yHi - yLo);
+    const x_dec = (1 - z_dec) * xLo + z_dec * xHi;
+    const ux_dec = Math.sqrt(
+      (SDy*SDy + Math.pow(decisionY * CVy / 100, 2)) / (b*b)
+      + Math.pow((1 - z_dec) * slo, 2)
+      + Math.pow(z_dec * shi, 2)
+    );
+    const U_rel_dec = ux_dec / x_dec * 100;
+    const pass_dec = U_rel_dec <= biasSpec;
+    const extrapol = (z_dec < 0 || z_dec > 1);
+    decisionBlock = { z: z_dec, x: x_dec, ux: ux_dec, U_rel: U_rel_dec, pass: pass_dec, y: decisionY, extrapol };
+  }
 
   // Difference at each level
   const diffLo = yLo - xLo;
@@ -10141,6 +10172,72 @@ function mentor_runAnalysis() {
   const verdictBorder = pass?'#86efac':'#fca5a5';
   const verdictColor = pass?'var(--green)':'var(--red)';
   const verdictIcon = pass?'✅':'❌';
+
+  // Build Decision-Level Uncertainty block (Kallner) if decisionY provided
+  let decisionHTML = '';
+  if (decisionBlock) {
+    const dPass = decisionBlock.pass;
+    const dBg = dPass ? 'var(--green-light)' : 'var(--red-light)';
+    const dBorder = dPass ? '#86efac' : '#fca5a5';
+    const dColor = dPass ? 'var(--green)' : 'var(--red)';
+    const dIcon = dPass ? '✅' : '❌';
+    const verdictLabel = dPass ? 'PASS' : 'FAIL — ux too large';
+    const extrapolNote = decisionBlock.extrapol
+      ? '<div style="font-size:11px;color:#b91c1c;margin-top:6px;padding:6px 10px;background:#fef2f2;border-left:3px solid #dc2626;border-radius:0 4px 4px 0"><b>⚠ Extrapolation:</b> y = ' + decisionBlock.y + ' ' + unit + ' lies outside the calibration range [' + fmt(yLo,2) + ', ' + fmt(yHi,2) + ']. Uncertainty may be unreliable.</div>'
+      : '';
+    decisionHTML =
+      '<div class="card" style="border:2px solid ' + dBorder + ';background:' + dBg + '">' +
+        '<div class="card-title">🎯 Decision-Level Uncertainty <span class="tag">Kallner Mentor v1.35</span></div>' +
+        '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">' +
+          '<div style="font-size:32px">' + dIcon + '</div>' +
+          '<div>' +
+            '<div style="font-size:18px;font-weight:700;color:' + dColor + '">' + verdictLabel + '</div>' +
+            '<div style="font-size:12px;color:var(--gray-700);margin-top:2px">' +
+              'At y = <strong>' + decisionBlock.y + ' ' + unit + '</strong>: ' +
+              'U<sub>rel</sub> = <strong>' + fmt(decisionBlock.U_rel, 2) + '%</strong> ' +
+              '(allowable: ' + biasSpec + '%)' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:10px 0">' +
+          '<div class="ep09-stat-cell">' +
+            '<div class="ep09-stat-val">' + fmt(decisionBlock.y, 3) + '</div>' +
+            '<div class="ep09-stat-lbl">y (decision level)</div>' +
+            '<div class="ep09-stat-ci">candidate units</div>' +
+          '</div>' +
+          '<div class="ep09-stat-cell">' +
+            '<div class="ep09-stat-val">' + fmt(decisionBlock.z, 4) + '</div>' +
+            '<div class="ep09-stat-lbl">z (position)</div>' +
+            '<div class="ep09-stat-ci">' + (decisionBlock.extrapol ? 'extrapolation' : 'interpolation') + '</div>' +
+          '</div>' +
+          '<div class="ep09-stat-cell">' +
+            '<div class="ep09-stat-val">' + fmt(decisionBlock.x, 3) + '</div>' +
+            '<div class="ep09-stat-lbl">x<sub>recal</sub></div>' +
+            '<div class="ep09-stat-ci">recalibrated value</div>' +
+          '</div>' +
+          '<div class="ep09-stat-cell">' +
+            '<div class="ep09-stat-val">' + fmt(decisionBlock.ux, 4) + '</div>' +
+            '<div class="ep09-stat-lbl">u<sub>x</sub></div>' +
+            '<div class="ep09-stat-ci">uncertainty at y</div>' +
+          '</div>' +
+          '<div class="ep09-stat-cell" style="background:' + (dPass ? 'var(--green-light)' : 'var(--red-light)') + '">' +
+            '<div class="ep09-stat-val" style="color:' + dColor + '">' + fmt(decisionBlock.U_rel, 2) + '%</div>' +
+            '<div class="ep09-stat-lbl">U<sub>rel</sub> (u<sub>x</sub>/x)</div>' +
+            '<div class="ep09-stat-ci">' + (dPass ? '✅ Pass' : '❌ Fail') + ' (≤' + biasSpec + '%)</div>' +
+          '</div>' +
+        '</div>' +
+        extrapolNote +
+        '<div style="font-size:11px;color:var(--gray-500);margin-top:8px;line-height:1.4">' +
+          '<b>Formula (Kallner Mentor method):</b> ' +
+          'u<sub>x</sub> = √((SD<sub>y</sub>² + (y·CV<sub>y</sub>/100)²)/b² + ((1−z)·s<sub>lo</sub>)² + (z·s<sub>hi</sub>)²), ' +
+          'where z = (y−y<sub>lo</sub>)/(y<sub>hi</sub>−y<sub>lo</sub>), x = (1−z)·x<sub>lo</sub> + z·x<sub>hi</sub>' +
+        '</div>' +
+        '<div style="font-size:10px;color:var(--gray-400);margin-top:4px;line-height:1.4;font-style:italic">' +
+          'Ref: Kallner A, Khorovskaya L, Pettersson T. Scand J Clin Lab Invest 2005;65:551–8. ' +
+          'Kallner Mentor v1.35 spreadsheet.' +
+        '</div>' +
+      '</div>';
+  }
 
   rw.innerHTML = `
   <!-- VERDICT -->
@@ -10189,6 +10286,8 @@ function mentor_runAnalysis() {
       &nbsp;·&nbsp; ${refInstr} (X) vs ${newInstr} (Y)
     </div>
   </div>
+
+  ${decisionHTML}
 
   <!-- MEASUREMENTS SUMMARY -->
   <div class="card">
@@ -10240,7 +10339,7 @@ function mentor_runAnalysis() {
 
   <!-- DIFFERENCE PLOT -->
   <div class="card">
-    <div class="card-title">📈 Difference Plot <span class="tag">Mentor · Two Points</span></div>
+    <div class="card-title">📈 Difference &amp; Recalibration Uncertainty <span class="tag">Mentor · Two Points · bars = ±U<sub>rel</sub> (k=2)</span></div>
     ${baSVG}
     <div style="font-size:11px;color:var(--gray-400);margin-top:8px">
       Ref: JCGM 100:2008 (GUM) · Kallner A. <em>Clin Chem Lab Med</em> 2013;51:2249–51 · Larsen Mehus L. <em>Bioingeniøren</em> 6/7, 2010
@@ -10675,13 +10774,16 @@ function inter_runAnalysis() {
     const loaLo = meanD - 1.96*sdD;
     const loaHi = meanD + 1.96*sdD;
 
-    // Relative bias vs master instrument: (mean_candidate − mean_master) / mean_master × 100
-    // meanD = mean(Y−X) = mean(candidate) − mean(master) for paired data.
-    const grandMean  = means.reduce((a,b)=>a+b,0)/n;   // for BA x-axis / absolute plot
-    const meanMaster = X.reduce((a,b)=>a+b,0)/n;       // master (reference) grand mean
-    const relBiasSigned = meanMaster !== 0 ? (meanD/meanMaster*100) : NaN;
-    const relBias   = Math.abs(relBiasSigned);
-    const pass      = !isNaN(relBias) && relBias < allowable;
+    // Relative bias — per-pair average of (Yi-Xi)/((Xi+Yi)/2)*100, then mean.
+    // This matches Analyse-it AND Ascentry Validation Manager ("Mean difference
+    // over all samples" mode), both of which report +1.08% on this dataset.
+    // NOTE: a grand-mean ratio (Ȳ-X̄)/X̄ gives ~0.89% on this data and does NOT
+    // match either reference tool — so per-pair averaging is the correct method here.
+    const grandMean  = means.reduce((a,b)=>a+b,0)/n;
+    const perPairPct = means.map((m,i) => m !== 0 ? (diffs[i]/m*100) : 0);
+    const relBiasSigned = perPairPct.reduce((a,b)=>a+b,0)/n;
+    const relBias    = Math.abs(relBiasSigned);
+    const pass       = !isNaN(relBias) && relBias < allowable;
     if (!pass) allPass = false;
 
     const fmt = (v,d=3) => isNaN(v)?'—':v.toFixed(d);
@@ -10691,11 +10793,10 @@ function inter_runAnalysis() {
 
     // SVG Bland-Altman — both absolute and relative, toggle via button
     const instId = inst.id;
-    const relDiffs = diffs.map(d => meanMaster !== 0 ? (d/meanMaster*100) : 0);  // each difference as % of master mean
-    const relMeanD = relBiasSigned;                                              // = mean(Y−X)/mean_master × 100 (= reported bias)
-    const relSD    = Math.sqrt(relDiffs.reduce((a,v)=>a+(v-relMeanD)**2,0)/(n-1));
-    const relLoaLo = relMeanD - 1.96*relSD;
-    const relLoaHi = relMeanD + 1.96*relSD;
+    const relDiffs = means.map((m,i) => m !== 0 ? (diffs[i]/m*100) : 0);
+    const relMeanD = relBiasSigned;  // per-pair mean, matches headline relBias
+    const relLoaLo = relMeanD - 1.96*(Math.sqrt(relDiffs.reduce((a,v)=>a+(v-relMeanD)**2,0)/(n-1)));
+    const relLoaHi = relMeanD + 1.96*(Math.sqrt(relDiffs.reduce((a,v)=>a+(v-relMeanD)**2,0)/(n-1)));
     const baSVG_abs = inter_baSVG(means, diffs, meanD, loaLo, loaHi, allowable, grandMean, unit, refName, inst.name, false, instId);
     const baSVG_rel = inter_baSVG(means, relDiffs, relMeanD, relLoaLo, relLoaHi, allowable, grandMean, '%', refName, inst.name, true, instId);
     const baSVG = '<div style="margin-bottom:8px">'
@@ -10725,9 +10826,9 @@ function inter_runAnalysis() {
       <!-- Key stats row -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px">
         <div class="ep09-stat-cell" style="background:${vBg};border-color:${vBord}">
-          <div class="ep09-stat-val" style="color:${vColor}">${fmt(relBiasSigned,2)}%</div>
-          <div class="ep09-stat-lbl">Bias vs master (Ȳ−X̄)/X̄</div>
-          <div class="ep09-stat-ci">Allowable: ±${fmt(allowable,2)}%</div>
+          <div class="ep09-stat-val" style="color:${vColor}">${fmt(relBias,2)}%</div>
+          <div class="ep09-stat-lbl">Relative bias (mean of per-sample %)</div>
+          <div class="ep09-stat-ci">Allowable: ${fmt(allowable,2)}%</div>
         </div>
         <div class="ep09-stat-cell">
           <div class="ep09-stat-val">${fmt(meanD)}</div>
@@ -10749,7 +10850,7 @@ function inter_runAnalysis() {
       ${baSVG}
 
       <div style="margin-top:8px;font-size:11px;color:var(--gray-400)">
-        Criterion: |bias| = |(Ȳ−X̄)/X̄| &lt; CV<sub>I</sub>/3 = ${fmt(allowable,2)}%
+        Criterion: |mean difference| &lt; CV<sub>I</sub>/3 = ${fmt(allowable,2)}%
         &nbsp;·&nbsp; Fraser CG. <em>Scand J Clin Lab Invest</em> 1999;59:487–490
       </div>
     </div>`;
@@ -11080,11 +11181,6 @@ function initInterPanel_body() {
       <div style="font-size:12px;color:var(--gray-500);margin-bottom:10px">
         Each instrument measures the <strong>same patient samples</strong> in the same order.
         Paste one value per row from Excel. Sample count may differ between instruments — analysis uses the minimum n.
-      </div>
-      <div class="cv-dropzone" data-cv-upload="inter" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:12px">
-        <button class="btn" style="background:#fff;border:1px solid #0369a1;color:#075985;font-size:12px;padding:6px 12px" onclick="cvDownloadInterTemplate()">⬇️ Download Template (CSV)</button>
-        <button class="btn" style="background:#0369a1;color:#fff;font-size:12px;padding:6px 12px" onclick="cvUploadInter()">📤 Upload Excel / CSV</button>
-        <span style="font-size:11px;color:#075985">Wide format — one row per sample: Sample No · Analyte · Unit · &lt;Ref&gt; (Reference) · &lt;Instrument 2&gt; · &lt;Instrument 3&gt; · … &nbsp;·&nbsp; <b>📎 or drag &amp; drop a file here</b></span>
       </div>
       <div id="inter-instruments-wrap"></div>
       <div class="btn-row" style="margin-top:10px">
@@ -11941,7 +12037,7 @@ function getM2ReportHTML() {
     const id = lv.id;
     const vals = getAllM2Vals(lv);
     if (vals.length < 2) return;
-    const {mean, sd, cv, N} = calcStats(vals);
+    let {mean, sd, cv, N} = calcStats(vals);
     // Raw data display
     const rawTable = `<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;color:#475569;margin-bottom:4px">Raw Data (n=${N})</div>
       <div style="display:flex;flex-wrap:wrap;gap:4px">${vals.map(v=>`<span style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace">${v}</span>`).join('')}</div></div>`;
@@ -11949,6 +12045,40 @@ function getM2ReportHTML() {
     // Variance components
     const k = lv.k || parseInt(document.getElementById('m2-days')?.value) || 5;
     const n = lv.n || parseInt(document.getElementById('m2-reps')?.value) || 1;
+    // ── EP15-A3 within-lab precision (sWL) via ANOVA variance-components ──
+    // Replaces simple pooled stdev to satisfy CLSI EP15-A3 §4.7 tie-breaking
+    // rule (σ²_B = 0 when MSb ≤ MSw). Mirrors calcM2Level and buildSection.
+    if (m2Design !== 'C' && n > 1) {
+      const runs = [];
+      for (let r = 1; r <= k; r++) {
+        const row = [];
+        for (let rep = 1; rep <= n; rep++) {
+          const v = parseFloat(document.getElementById('m2-l'+id+'-r'+r+'-n'+rep)?.value);
+          if (!isNaN(v)) row.push(v);
+        }
+        if (row.length) runs.push(row);
+      }
+      if (runs.length > 1) {
+        const mn = vals.reduce((a,b)=>a+b,0) / vals.length;
+        let SS1 = 0;
+        runs.forEach(run => {
+          const rm = run.reduce((a,b)=>a+b,0) / run.length;
+          SS1 += run.length * Math.pow(rm - mn, 2);
+        });
+        let SS2 = 0;
+        runs.forEach(run => {
+          const rm = run.reduce((a,b)=>a+b,0) / run.length;
+          run.forEach(v => { SS2 += Math.pow(v - rm, 2); });
+        });
+        const DF1 = runs.length - 1, DF2 = vals.length - runs.length;
+        const MS1 = SS1 / DF1, MS2 = SS2 / DF2;
+        const VW = MS2;
+        const VB = MS1 > MS2 ? (MS1 - MS2) / n : 0;  // EP15-A3 tie-breaking
+        const sWL_val = Math.sqrt(VW + VB);
+        sd = sWL_val;
+        cv = (sWL_val / mn) * 100;
+      }
+    }
     // Goals
     const sigmaFirmaEl = document.getElementById('m2-l'+id+'-goal-firma');
     const sigmaFirma = parseFloat(document.getElementById('m2-l'+id+'-goal-firma')?.querySelector('input')?.value || document.getElementById('m2-l'+id+'-sigma')?.value || '');
@@ -12657,69 +12787,25 @@ function cvDownloadCSV(filename, rows, delim) {
 
 // Small helper: hidden file input → callback(rows). Shows a friendly
 // message if XLSX is chosen offline.
-// Shared file->rows reader (used by both click-to-pick and drag-and-drop).
-var _cvPendingFile = null;
-function cvReadFileToRows(file, onRows) {
-  cvReadFile(file).then(function(rows){
-    onRows(rows, file);
-  }).catch(function(err){
-    if (err && err.message === 'offline-xlsx') {
-      alert('Reading .xlsx needs an internet connection (the spreadsheet engine is loaded from a CDN).\n\nYou appear to be offline or the file was opened locally.\n\nWorkaround: In Excel choose "Save As -> CSV (Comma delimited)" and upload the .csv instead - that works fully offline.');
-    } else {
-      alert('Could not read the file: ' + (err && err.message ? err.message : 'unknown error'));
-    }
-  });
-}
-
 function cvPickFile(onRows) {
-  // If a file was just dropped on a drop-zone, use it instead of opening the picker.
-  if (_cvPendingFile) { var f = _cvPendingFile; _cvPendingFile = null; cvReadFileToRows(f, onRows); return; }
   var input = document.createElement('input');
   input.type = 'file';
   input.accept = '.csv,.xlsx,.txt';
   input.onchange = function(){
     var file = input.files && input.files[0];
     if (!file) return;
-    cvReadFileToRows(file, onRows);
+    cvReadFile(file).then(function(rows){
+      onRows(rows, file);
+    }).catch(function(err){
+      if (err && err.message === 'offline-xlsx') {
+        alert('Reading .xlsx needs an internet connection (the spreadsheet engine is loaded from a CDN).\n\nYou appear to be offline or the file was opened locally.\n\nWorkaround: In Excel choose "Save As → CSV (Comma delimited)" and upload the .csv instead — that works fully offline.');
+      } else {
+        alert('Could not read the file: ' + (err && err.message ? err.message : 'unknown error'));
+      }
+    });
   };
   input.click();
 }
-
-// Drag-and-drop: any element with class "cv-dropzone" and data-cv-upload="<module>"
-// accepts a dropped .csv/.xlsx and routes it to that module's existing upload handler.
-var CV_UPLOAD_FNS = { m1:'cvUploadM1', m2:'cvUploadM2', ep09:'cvUploadEP09', mentor:'cvUploadMentor', inter:'cvUploadInter', ri:'cvUploadRI', bias:'cvUploadBias' };
-(function cvInitDropDelegation(){
-  function zoneOf(t){
-    while (t && t !== document) {
-      if (t.classList && t.classList.contains('cv-dropzone')) return t;
-      t = t.parentNode;
-    }
-    return null;
-  }
-  function hi(z,on){ if(!z) return; z.style.outline = on?'2px dashed #2563eb':''; z.style.outlineOffset = on?'3px':''; }
-  // Prevent the browser from navigating to / opening a dropped file ANYWHERE on the page.
-  window.addEventListener('dragover', function(e){
-    e.preventDefault();
-    var z = zoneOf(e.target);
-    if (z) { try{ e.dataTransfer.dropEffect='copy'; }catch(_){}  hi(z,true); }
-  }, false);
-  window.addEventListener('dragleave', function(e){
-    var z = zoneOf(e.target);
-    if (z && (!e.relatedTarget || !z.contains(e.relatedTarget))) hi(z,false);
-  }, false);
-  window.addEventListener('drop', function(e){
-    e.preventDefault();
-    var z = zoneOf(e.target);
-    if (!z) return;
-    hi(z,false);
-    var file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-    if (!file) { alert('No file detected in the drop.'); return; }
-    if (!/\.(csv|xlsx|xls|txt)$/i.test(file.name||'')) { alert('Please drop a .csv or .xlsx file (got: ' + file.name + ').'); return; }
-    var fnName = CV_UPLOAD_FNS[z.getAttribute('data-cv-upload')];
-    if (fnName && typeof window[fnName]==='function') { _cvPendingFile = file; window[fnName](); }
-    else { alert('Drop handler not wired for this box.'); }
-  }, false);
-})();
 
 // Meta validation helper. Checks the analyte cell in an uploaded sheet
 // against the module's current analyte input; warns (non-blocking) on mismatch.
@@ -13173,228 +13259,6 @@ function cvUploadMentor() {
     if (groups['ref-low'].length>=2 && groups['ref-high'].length>=2 && groups['new-low'].length>=2 && groups['new-high'].length>=2 && typeof mentor_runAnalysis==='function') {
       mentor_runAnalysis();
     }
-    if (typeof showToast==='function') showToast(msg); else alert(msg);
-  });
-}
-
-// ── Inter-Instrument (Fraser CVI/3) ────────────────────────
-// Wide format: one row per sample. Columns after Sample/Analyte/Unit are the
-// instruments; the one whose header contains "(Reference)" is the reference (X),
-// the rest are candidate instruments. Values paired by row (sample) index.
-function cvDownloadInterTemplate() {
-  var ref=[54.6,63.1,65.0,76.4,53.0,91.3,109.6,109.0,117.3,108.7,116.6,261.9,258.7,228.7,173.0,235.4,330.8,541.9,428.3,546.1,1005.3,1010.5,726.5,750.9];
-  var c2 =[53.9,65.4,66.4,77.1,53.5,92.0,110.8,109.1,120.5,109.6,117.7,266.0,259.4,230.6,171.7,241.7,335.8,551.2,439.9,548.8,1010.5,997.9,739.4,760.4];
-  var c3 =[53.9,64.7,64.9,74.8,52.7,91.8,110.7,106.6,118.7,106.9,116.3,260.5,255.0,229.1,169.2,231.2,331.3,537.6,430.6,543.0,996.9,1004.1,712.4,740.7];
-  var rows=[['Sample No','Analyte','Unit','cobas c703-1 (Reference)','cobas c703-2','cobas c703-3']];
-  for (var i=0;i<ref.length;i++){
-    rows.push([String(i+1),'Creatinine','µmol/L',
-      String(ref[i]).replace('.',','), String(c2[i]).replace('.',','), String(c3[i]).replace('.',',')]);
-  }
-  cvDownloadCSV('ClinVerify_InterInstrument_template.csv', rows, ';');
-}
-
-function cvUploadInter() {
-  cvPickFile(function(rows){
-    if (!rows.length) { alert('Empty file.'); return; }
-    var header = rows[0];
-    var iSample = cvColIdx(header, ['Sample No','Sample','No','Örnek','Ornek']);
-    var iAnalyte = cvColIdx(header, ['Analyte','Analit']);
-    var iUnit = cvColIdx(header, ['Unit','Birim']);
-    var exclude = {}; [iSample,iAnalyte,iUnit].forEach(function(x){ if(x!==-1) exclude[x]=true; });
-    var valueCols = [];
-    for (var c=0;c<header.length;c++){ if(!exclude[c] && String(header[c]||'').trim()!=='') valueCols.push(c); }
-    if (valueCols.length < 2) {
-      alert('Need a reference column and at least one candidate instrument column.\n\nHeader (wide format):\nSample No; Analyte; Unit; <Ref name> (Reference); <Instrument 2>; <Instrument 3>; ...');
-      return;
-    }
-    var refCol = valueCols.find(function(idx){ return /reference|\(ref|ref\)/i.test(String(header[idx])); });
-    if (refCol===undefined) refCol = valueCols[0];
-    var candCols = valueCols.filter(function(idx){ return idx!==refCol; });
-
-    var body = rows.slice(1).filter(function(r){ return r.some(function(v){return v!=='';}); });
-    var upAnalyte=''; for(var k=0;k<body.length;k++){ if(iAnalyte!==-1 && body[k][iAnalyte]){ upAnalyte=body[k][iAnalyte]; break; } }
-    if (!cvValidateAnalyte(upAnalyte, 'inter-analyte')) return;
-
-    var num = function(v){ return parseFloat(String(v).replace(',','.')); };
-    var refVals=[], candArrs=candCols.map(function(){return [];});
-    body.forEach(function(row){
-      var rv=num(row[refCol]);
-      if (isNaN(rv)) return;                    // skip rows with no reference value (keeps pairing aligned)
-      refVals.push(rv);
-      candCols.forEach(function(cc,ci){ candArrs[ci].push(num(row[cc])); });
-    });
-    // keep each candidate's aligned numeric prefix (row-paired with reference)
-    candArrs = candArrs.map(function(arr){ var out=[]; for(var i=0;i<arr.length;i++){ if(isNaN(arr[i])) break; out.push(arr[i]); } return out; });
-    if (refVals.length < 2) { alert('Reference column has fewer than 2 numeric values.'); return; }
-
-    var refName = String(header[refCol]).replace(/\s*\(reference\)/i,'').trim() || 'Reference';
-    var candNames = candCols.map(function(cc){ return String(header[cc]).trim(); });
-
-    // Metadata
-    if (upAnalyte && !document.getElementById('inter-analyte').value) {
-      document.getElementById('inter-analyte').value=upAnalyte;
-      if(typeof syncAnalyteFromSource==='function') syncAnalyteFromSource('inter');
-      if(typeof inter_autoEFLM==='function') inter_autoEFLM();
-    }
-    if (iUnit!==-1) { for(var u=0;u<body.length;u++){ if(body[u][iUnit]){ var ue=document.getElementById('inter-unit'); if(ue&&!ue.value) ue.value=body[u][iUnit]; break; } } }
-
-    // Fill data model + render
-    interRefData = refVals;
-    interInstruments = candNames.map(function(nm,ci){ return { id: interNextId++, name: nm, data: candArrs[ci] }; });
-    if (typeof inter_renderInstruments==='function') inter_renderInstruments();
-    var rnEl = document.getElementById('inter-ref-name'); if(rnEl){ rnEl.value = refName; rnEl._userSet=true; }
-    if (typeof inter_showStats==='function') inter_showStats('inter-ref-stats','inter-ref-preview', interRefData, 'Reference');
-    interInstruments.forEach(function(inst){
-      var nmEl=document.getElementById('inter-name-'+inst.id); if(nmEl) nmEl.value=inst.name;
-      if (typeof inter_showStats==='function') inter_showStats('inter-stats-'+inst.id,'inter-preview-'+inst.id, inst.data, inst.name);
-    });
-
-    if (typeof inter_runAnalysis==='function') inter_runAnalysis();
-    var msg='Inter-Instrument import: ref "'+refName+'" (n='+interRefData.length+') + '+interInstruments.length+' candidate instrument(s)';
-    if (typeof showToast==='function') showToast(msg); else alert(msg);
-  });
-}
-
-// ── RI (Reference Interval Verification, CLSI EP28-A3c) ─────
-// Long format: one measurement per row.
-// Round 1 = reference sample (n≥20, establishes/verifies RI); Round 2 = validation set (20).
-// Optional Gender + RI Lower/Upper (claimed interval); if omitted, filled from RI_DB.
-function cvDownloadRITemplate() {
-  var vals=[98.7,74.7,83.2,81.2,86.7,68.8,76.7,74.0,71.4,73.2,75.9,77.7,72.7,83.4,75.6,54.4,89.5,76.9,74.1,82.1];
-  var rows=[['Sample No','Analyte','Unit','Gender','RI Lower','RI Upper','Round','Value']];
-  for (var i=0;i<vals.length;i++){
-    rows.push([String(i+1),'Creatinine','µmol/L','Male','60','105','1', String(vals[i]).replace('.',',')]);
-  }
-  cvDownloadCSV('ClinVerify_RI_ReferenceInterval_template.csv', rows, ';');
-}
-
-function cvUploadRI() {
-  cvPickFile(function(rows){
-    if (!rows.length) { alert('Empty file.'); return; }
-    var header = rows[0];
-    var iValue  = cvColIdx(header, ['Value','Deger','Değer','Result','Sonuc','Sonuç','Measurement']);
-    var iAnalyte= cvColIdx(header, ['Analyte','Analit']);
-    var iUnit   = cvColIdx(header, ['Unit','Birim']);
-    var iGender = cvColIdx(header, ['Gender','Sex','Cinsiyet']);
-    var iRound  = cvColIdx(header, ['Round','Set','Runde']);
-    var iLower  = cvColIdx(header, ['RI Lower','Lower','Lower Limit','Alt','Alt Sınır']);
-    var iUpper  = cvColIdx(header, ['RI Upper','Upper','Upper Limit','Üst','Ust','Üst Sınır']);
-    if (iValue === -1) {
-      alert('Could not find the Value column.\n\nHeader:\nSample No; Analyte; Unit; Gender; RI Lower; RI Upper; Round; Value');
-      return;
-    }
-    var body = rows.slice(1).filter(function(r){ return r.some(function(v){return v!=='';}); });
-    var upAnalyte=''; for(var k=0;k<body.length;k++){ if(iAnalyte!==-1 && body[k][iAnalyte]){ upAnalyte=body[k][iAnalyte]; break; } }
-    if (!cvValidateAnalyte(upAnalyte, 'ri-analyte')) return;
-
-    var num = function(v){ return parseFloat(String(v).replace(',','.')); };
-    var r1=[], r2=[];
-    body.forEach(function(row){
-      var v = num(row[iValue]);
-      if (isNaN(v)) return;
-      var rnd = iRound!==-1 ? String(row[iRound]||'').trim().toLowerCase() : '1';
-      if (rnd==='2' || /valid|verif|runde\s*2|round\s*2/.test(rnd)) r2.push(v); else r1.push(v);
-    });
-    if (r1.length===0 && r2.length===0) { alert('No numeric values found in the Value column.'); return; }
-
-    // Metadata
-    var aEl = document.getElementById('ri-analyte');
-    if (upAnalyte && aEl && !aEl.value) { aEl.value=upAnalyte; if(typeof riAnalyteInput==='function') riAnalyteInput(); }
-    if (iUnit!==-1) { for(var u=0;u<body.length;u++){ if(body[u][iUnit]){ var ue=document.getElementById('ri-unit'); if(ue&&!ue.value) ue.value=body[u][iUnit]; break; } } }
-
-    // Gender (only if provided)
-    if (iGender!==-1) {
-      var g=''; for(var gi=0;gi<body.length;gi++){ if(body[gi][iGender]){ g=String(body[gi][iGender]).trim().toLowerCase(); break; } }
-      var gVal = /^(m|male|erkek|e\b)/.test(g) ? 'male' : (/^(f|k|female|kad)/.test(g) ? 'female' : '');
-      if (gVal) {
-        var gRow=document.getElementById('ri-gender-row'); if(gRow) gRow.style.display='';
-        var gSel=document.getElementById('ri-gender'); if(gSel) gSel.value=gVal;
-        var glEl=document.getElementById('ri-group-label'); if(glEl && !glEl.value) glEl.value = gVal==='male'?'Male':'Female';
-      }
-    }
-    // Claimed RI from file (overrides only if empty)
-    function firstVal(idx){ for(var i=0;i<body.length;i++){ if(body[i][idx]!==undefined && body[i][idx]!=='') return body[i][idx]; } return ''; }
-    if (iLower!==-1) { var lo=num(firstVal(iLower)); var loEl=document.getElementById('ri-lower'); if(loEl && !loEl.value && !isNaN(lo)) loEl.value=lo; }
-    if (iUpper!==-1) { var hi=num(firstVal(iUpper)); var hiEl=document.getElementById('ri-upper'); if(hiEl && !hiEl.value && !isNaN(hi)) hiEl.value=hi; }
-
-    // Fill grids, then compute
-    setTimeout(function(){
-      if (r1.length) { var ta1=document.getElementById('ri-paste-1'); if(ta1){ ta1.value=r1.join('\n'); if(typeof riHandlePaste==='function') riHandlePaste(1); } }
-      if (r2.length) { var ta2=document.getElementById('ri-paste-2'); if(ta2){ ta2.value=r2.join('\n'); if(typeof riHandlePaste==='function') riHandlePaste(2); } }
-      if (typeof riApplyGender==='function') riApplyGender();
-      setTimeout(function(){
-        if (typeof riRunCurrent==='function') riRunCurrent();
-        var msg='RI import: Round 1 n='+r1.length + (r2.length?(' · Round 2 n='+r2.length):'');
-        if (typeof showToast==='function') showToast(msg); else alert(msg);
-      }, 200);
-    }, 120);
-  });
-}
-
-// ── Bias (IQC vs assigned target) ──────────────────────────
-// Uses the SAME IQC file as the M2 module (Level + Value). Bias module reads the
-// per-level values, computes the mean, and Bias = (mean − Target)/Target × 100.
-// Target (assigned/kit-insert value) is entered per level; no CV / ANOVA needed.
-// Template is intentionally identical to the M2 between-day template.
-function cvDownloadBiasTemplate() {
-  if (typeof cvDownloadM2Template === 'function') { cvDownloadM2Template(); return; }
-}
-
-function cvUploadBias() {
-  cvPickFile(function(rows){
-    if (!rows.length) { alert('Empty file.'); return; }
-    var header = rows[0];
-    var iLevel  = cvColIdx(header, ['Level','Seviye','Nivå','Control Level','Kontrol']);
-    var iValue  = cvColIdx(header, ['Value','Deger','Değer','Result','Sonuc','Sonuç']);
-    var iTarget = cvColIdx(header, ['Target','Target Value','Assigned','Assigned Value','Hedef','Kit','Kit Value']);
-    var iAnalyte= cvColIdx(header, ['Analyte','Analit']);
-    var iUnit   = cvColIdx(header, ['Unit','Birim']);
-    var iInstr  = cvColIdx(header, ['Instrument','Enstrüman','Enstruman','Cihaz','Device']);
-    if (iValue===-1 || iLevel===-1) {
-      alert('Need "Level" and "Value" columns (same as the M2 IQC file). Add a "Target" column for the assigned value.\n\nHeader:\nSample No; Date; Analyte; Unit; Instrument; Material; Level; Target; Value');
-      return;
-    }
-    var body = rows.slice(1).filter(function(r){ return r.some(function(v){return v!=='';}); });
-    var upAnalyte=''; for(var k=0;k<body.length;k++){ if(iAnalyte!==-1 && body[k][iAnalyte]){ upAnalyte=body[k][iAnalyte]; break; } }
-    if (!cvValidateAnalyte(upAnalyte, 'bias-iqc-analyte')) return;
-
-    var num=function(v){ return parseFloat(String(v).replace(',','.')); };
-    var order=[], groups={};
-    body.forEach(function(row){
-      var lvlRaw=String(row[iLevel]||'').trim(); if(!lvlRaw) return;
-      var v=num(row[iValue]); if(isNaN(v)) return;
-      if(!groups[lvlRaw]){ groups[lvlRaw]={vals:[],target:NaN}; order.push(lvlRaw); }
-      groups[lvlRaw].vals.push(v);
-      if(iTarget!==-1 && isNaN(groups[lvlRaw].target)){ var t=num(row[iTarget]); if(!isNaN(t)) groups[lvlRaw].target=t; }
-    });
-    if (order.length===0) { alert('No Level/Value data found.'); return; }
-
-    // Metadata
-    if (upAnalyte && !document.getElementById('bias-iqc-analyte').value) {
-      document.getElementById('bias-iqc-analyte').value=upAnalyte;
-      if(typeof syncAnalyteFromSource==='function') syncAnalyteFromSource('bias-iqc');
-      if(typeof biasIQC_updateEFLM==='function') biasIQC_updateEFLM();
-    }
-    var upUnit=''; if(iUnit!==-1){ for(var u=0;u<body.length;u++){ if(body[u][iUnit]){ upUnit=String(body[u][iUnit]).trim(); break; } } }
-    if (upUnit){ var buEl=document.getElementById('bias-iqc-unit'); if(buEl && !buEl.value) buEl.value=upUnit; }
-    if (iInstr!==-1){ for(var ii=0;ii<body.length;ii++){ if(body[ii][iInstr]){ var insEl=document.getElementById('bias-iqc-instrument'); if(insEl && !insEl.value) insEl.value=String(body[ii][iInstr]).trim(); break; } } }
-
-    // Clear existing levels, then add one per control level
-    if (typeof biasIQC_levels!=='undefined') { biasIQC_levels.slice().forEach(function(lid){ if(typeof biasIQC_removeLevel==='function') biasIQC_removeLevel(lid); }); }
-
-    order.forEach(function(lvl){
-      var g=groups[lvl];
-      var mean=g.vals.reduce(function(a,b){return a+b;},0)/g.vals.length;
-      if (typeof biasIQC_addLevel==='function') biasIQC_addLevel();
-      var id=biasIQC_levels[biasIQC_levels.length-1];
-      var mEl=document.getElementById('bias-iqc-mean-'+id); if(mEl) mEl.value=mean.toFixed(3);
-      if(!isNaN(g.target)){ var tEl=document.getElementById('bias-iqc-target-'+id); if(tEl) tEl.value=g.target; }
-      if(upUnit){ var uEl=document.getElementById('bias-iqc-unit-'+id); if(uEl && !uEl.value) uEl.value=upUnit; }
-      if (typeof biasIQC_calcLevel==='function') biasIQC_calcLevel(id);
-    });
-
-    var withT = order.filter(function(l){ return !isNaN(groups[l].target); }).length;
-    var msg='Bias IQC import: '+order.length+' level(s), '+body.length+' values'+(withT<order.length?(' — enter Target for '+(order.length-withT)+' level(s)'):'');
     if (typeof showToast==='function') showToast(msg); else alert(msg);
   });
 }
