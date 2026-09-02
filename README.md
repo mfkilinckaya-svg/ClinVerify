@@ -47,10 +47,11 @@ CSV/XLSX import (drag-and-drop supported).
 
 ## Citation
 
-If you use ClinVerify in academic work, please cite it using the metadata in
-[`CITATION.cff`](CITATION.cff), or via its DOI:
+If you use ClinVerify in academic work, please cite it using the metadata in CITATION.cff, or as:
 
-> Kilinckaya, M. F. (2026). ClinVerify (v1.0.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.21255695
+Kilinckaya, M. F. (2026). ClinVerify: An Open-Source Single-File Tool for Clinical Laboratory Method Verification (v1.2.1) [Software]. Zenodo. https://doi.org/10.5281/zenodo.21255694
+
+The DOI above is the concept DOI and always resolves to the latest version. To cite the exact release you used, take the version DOI from the Zenodo record (v1.2.1: https://doi.org/10.5281/zenodo.XXXXXXXX).
 
 ## License
 
