@@ -362,7 +362,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;font-size:14px;color:var(--gray-800
     <div>
       <div class="sb-logo-text">ClinVerify</div>
       <div class="sb-logo-sub">CLSI · EFLM · Mentor</div>
-      <div class="sb-ver" id="cv-version">v1.2.0</div>
+      <div class="sb-ver" id="cv-version">v1.2.1</div>
     </div>
   </div>
 
@@ -827,7 +827,7 @@ break;case"<bookViews":;case"<bookViews>":;case"</bookViews>":break;case"<workbo
           bias evaluation, method comparison, and reference interval verification.
         </p>
         <p style="font-size:13px;color:var(--gray-500);margin-top:8px">
-          Developed for open-source publication on GitHub. Version <span id="cv-version-about">1.2.0</span>.
+          Developed for open-source publication on GitHub. Version <span id="cv-version-about">1.2.1</span>.
         </p>
         <p style="font-size:12px;color:var(--gray-400);margin-top:8px">
           Includes SheetJS Community Edition (xlsx.mini v0.18.5),
@@ -973,7 +973,7 @@ break;case"<bookViews":;case"<bookViews>":;case"</bookViews>":break;case"<workbo
       </div>
 
       <div style="text-align:center;font-size:12px;color:var(--gray-400);padding:16px 0">
-        ClinVerify v<span id="cv-version-footer">1.2.0</span> · Helse Møre og Romsdal HF · Medical Biochemistry
+        ClinVerify v<span id="cv-version-footer">1.2.1</span> · Helse Møre og Romsdal HF · Medical Biochemistry
       </div>
     </div>
   </div>
@@ -988,7 +988,7 @@ break;case"<bookViews":;case"<bookViews>":;case"</bookViews>":break;case"<workbo
 // footer all follow. Keep it identical to the Git tag, the Zenodo
 // release and the version stated in the manuscript.
 // ════════════════════════════════════════════════════════════
-const CV_VERSION = '1.2.0';
+const CV_VERSION = '1.2.1';
 
 function cvApplyVersion() {
   const badge = document.getElementById('cv-version');
@@ -2662,6 +2662,9 @@ function syncAnalyteFromSource(source) {
   } else if (source === 'inter') {
     analyte = document.getElementById('inter-analyte')?.value?.trim()||'';
     unit    = document.getElementById('inter-unit')?.value?.trim()||'';
+  } else if (source === 'lin') {
+    analyte = document.getElementById('lin-analyte')?.value?.trim()||'';
+    unit    = document.getElementById('lin-unit')?.value?.trim()||'';
   } else if (source === 'ri') {
     analyte = document.getElementById('ri-analyte')?.value?.trim()||'';
     unit    = document.getElementById('ri-unit')?.value?.trim()||'';
@@ -2732,9 +2735,12 @@ function syncAnalyteFromSource(source) {
           const unitEl = document.getElementById(mod+'-unit');
           if (unitEl && !anyOther) unitEl.value = mapEntry.unit;
         });
-        ['ep09-unit','mentor-unit','inter-unit'].forEach(id => {
+        ['ep09-unit','mentor-unit','inter-unit','lin-unit'].forEach(id => {
           const el = document.getElementById(id); if (el) el.value = mapEntry.unit;
         });
+        // Linearity keeps a free-text instrument; fill it only while it is empty
+        const linInstr = document.getElementById('lin-instrument');
+        if (linInstr && !linInstr.value && mapEntry.instrument) linInstr.value = mapEntry.instrument;
         if (source === 'm1') schedPILookup('m1');
         if (source === 'm2') schedPILookup('m2');
       };
@@ -2744,7 +2750,7 @@ function syncAnalyteFromSource(source) {
 
   // Push to all modules (skip source to avoid cursor jump)
   // Analyte name fields — skip active element (cursor jump prevention)
-  const analyteFields = ['m1-analyte','m2-analyte','bias-iqc-analyte','eqa-analyte','ri-analyte','ep09-analyte','mentor-analyte','inter-analyte'];
+  const analyteFields = ['m1-analyte','m2-analyte','bias-iqc-analyte','eqa-analyte','ri-analyte','ep09-analyte','mentor-analyte','inter-analyte','lin-analyte'];
   analyteFields.forEach(id => {
     const el = document.getElementById(id);
     if (el && el !== document.activeElement) el.value = analyte;
@@ -2782,12 +2788,14 @@ function syncAnalyteFromSource(source) {
     const riKey = resolveAnalyte(analyte);
     if (riKey && RI_DB[riKey].unit) {
       const dbUnit = RI_DB[riKey].unit;
-      ['m1-unit','m2-unit','bias-iqc-unit','eqa-unit','ri-unit','mentor-unit','ep09-unit','inter-unit'].forEach(id => {
+      ['m1-unit','m2-unit','bias-iqc-unit','eqa-unit','ri-unit','mentor-unit','ep09-unit','inter-unit','lin-unit'].forEach(id => {
         const el = document.getElementById(id);
         if (el && el !== document.activeElement && !el.value) el.value = dbUnit;
       });
     }
   }
+  // Linearity: the ADL lookup depends on the analyte name
+  if (source !== 'lin' && typeof lin_recalcAllowable === 'function' && document.getElementById('lin-analyte')) lin_recalcAllowable();
   // Bias IQC EFLM update
   if (source !== 'bias-iqc') {
     if (typeof biasIQC_updateEFLM === 'function') biasIQC_updateEFLM();
@@ -7097,7 +7105,7 @@ function riPrintCombinedReport() {
   </div>
   ${groupsHTML}
   <div style="margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;font-size:10px;color:#94a3b8;text-align:center">
-    Generated by ClinVerify · EP28-A3c §11.2 · ${today}
+    Generated by ClinVerify v${CV_VERSION} · EP28-A3c §11.2 · ${today}
   </div>
   </body></html>`;
 
@@ -8175,8 +8183,14 @@ function riPrintReport() {
 // ════════════════════════════════════════════════════════════
 // BIAS RAPOR / PRINT
 // ════════════════════════════════════════════════════════════
-function printBiasReport(mod) {
+// Builds the content of a bias report (info grid + level table). Shared by the
+// module's own print report and the combined verification report so that the
+// two never disagree.
+function buildBiasReportBody(mod, modeOverride) {
   const today = new Date().toLocaleDateString('tr-TR');
+  // EQA has two evaluation modes whose inputs both stay in the page; the combined
+  // report asks for each in turn, the module's own report uses the active one.
+  const mode = modeOverride || eqaEvalMode;
   const isIQC = mod === 'iqc';
   const analyt = document.getElementById(isIQC ? 'bias-iqc-analyte' : 'eqa-analyte')?.value || '—';
   const instrBase = document.getElementById(isIQC ? 'bias-iqc-instrument' : 'eqa-material')?.value || '—';
@@ -8224,7 +8238,7 @@ function printBiasReport(mod) {
     });
   } else {
     // EQA — aktif moda göre render et
-    if (eqaEvalMode === "zscore") {
+    if (mode === "zscore") {
       // Z-Score mode
       if (eqaZscoreLevels) eqaZscoreLevels.forEach(function(lid) {
         var lab  = parseFloat(document.getElementById("eqa-zs-lab-"  + lid) ? document.getElementById("eqa-zs-lab-" + lid).value : NaN);
@@ -8274,6 +8288,26 @@ function printBiasReport(mod) {
     }
   }
 
+  const infoHTML = ''
+    + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">'
+    + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px"><div style="font-size:10px;color:#64748b;text-transform:uppercase">Analyte</div><div style="font-size:13px;font-weight:600">' + analyt + '</div></div>'
+    + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px"><div style="font-size:10px;color:#64748b;text-transform:uppercase">' + (isIQC?'Instrument':'Program') + '</div><div style="font-size:13px;font-weight:600">' + instr + '</div></div>'
+    + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px"><div style="font-size:10px;color:#64748b;text-transform:uppercase">EFLM CVI/CVG</div><div style="font-size:13px;font-weight:600">' + cvi + '% / ' + cvg + '%</div></div>'
+    + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px"><div style="font-size:10px;color:#64748b;text-transform:uppercase">' + lvlLabel + '</div><div style="font-size:13px;font-weight:600">' + ba + '%</div></div>'
+    + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px"><div style="font-size:10px;color:#64748b;text-transform:uppercase">Unit</div><div style="font-size:13px;font-weight:600">' + (unit||'—') + '</div></div>'
+    + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px"><div style="font-size:10px;color:#64748b;text-transform:uppercase">Date</div><div style="font-size:13px;font-weight:600">' + today + '</div></div>'
+    + '</div>'
+    ;
+  const tableHTML = ''
+    + '<table><thead><tr>' + (!isIQC && mode === "zscore" ? '<th>Material / Sample</th><th>Lab Result</th><th>Group Mean</th><th>Group SD</th><th>Z-Score</th><th>Bias%</th><th>Result</th><th>-</th>' : '<th>Level</th><th>Measurement</th><th>Target (assigned)</th><th>CV%</th><th>Bias%</th><th>TEa / Allow. Bias</th><th>Result</th><th>Approval</th>') + '</tr></thead>'
+    + '<tbody>' + levelRows + '</tbody></table>'
+    ;
+  return { analyt, isIQC, today, infoHTML, tableHTML, hasRows: levelRows.trim().length > 0 };
+}
+
+function printBiasReport(mod) {
+  const B = buildBiasReportBody(mod);
+  const isIQC = B.isIQC, analyt = B.analyt, today = B.today;
   const reportHTML = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
     + '<title>Bias Verification Report — ' + analyt + '</title>'
     + '<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Segoe UI,Arial,sans-serif;font-size:13px;color:#1e293b;padding:24px}'
@@ -8284,16 +8318,7 @@ function printBiasReport(mod) {
     + '<div style="font-size:20px;font-weight:700;color:#1e40af">Bias Verification Report</div>'
     + '<div style="font-size:12px;color:#64748b">EP15-A3 · ' + (isIQC ? 'Internal Quality Control (IQC)' : 'External Quality Control (EQA)') + '</div>'
     + '</div>'
-    + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">'
-    + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px"><div style="font-size:10px;color:#64748b;text-transform:uppercase">Analyte</div><div style="font-size:13px;font-weight:600">' + analyt + '</div></div>'
-    + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px"><div style="font-size:10px;color:#64748b;text-transform:uppercase">' + (isIQC?'Instrument':'Program') + '</div><div style="font-size:13px;font-weight:600">' + instr + '</div></div>'
-    + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px"><div style="font-size:10px;color:#64748b;text-transform:uppercase">EFLM CVI/CVG</div><div style="font-size:13px;font-weight:600">' + cvi + '% / ' + cvg + '%</div></div>'
-    + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px"><div style="font-size:10px;color:#64748b;text-transform:uppercase">' + lvlLabel + '</div><div style="font-size:13px;font-weight:600">' + ba + '%</div></div>'
-    + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px"><div style="font-size:10px;color:#64748b;text-transform:uppercase">Unit</div><div style="font-size:13px;font-weight:600">' + (unit||'—') + '</div></div>'
-    + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px"><div style="font-size:10px;color:#64748b;text-transform:uppercase">Date</div><div style="font-size:13px;font-weight:600">' + today + '</div></div>'
-    + '</div>'
-    + '<table><thead><tr>' + (!isIQC && eqaEvalMode === "zscore" ? '<th>Material / Sample</th><th>Lab Result</th><th>Group Mean</th><th>Group SD</th><th>Z-Score</th><th>Bias%</th><th>Result</th><th>-</th>' : '<th>Level</th><th>Measurement</th><th>Target (assigned)</th><th>CV%</th><th>Bias%</th><th>TEa / Allow. Bias</th><th>Result</th><th>Approval</th>') + '</tr></thead>'
-    + '<tbody>' + levelRows + '</tbody></table>'
+    + B.infoHTML + B.tableHTML
     + '<div style="margin-top:30px;padding-top:12px;border-top:1px solid #e2e8f0;font-size:10px;color:#94a3b8;text-align:center">EP15-A3 · EFLM Biological Variation Database · ' + today + '</div>'
     + '</body></html>';
 
@@ -10326,7 +10351,7 @@ function ep09_printReport() {
   ${approvalHTML}
   ${rawDataHTML}
   <div style="margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;font-size:10px;color:#94a3b8;text-align:center">
-    Generated by ClinVerify · Passing &amp; Bablok 1983 · Bland &amp; Altman 1986 · CLSI EP09c · ${new Date().toLocaleDateString('tr-TR')}
+    Generated by ClinVerify v${CV_VERSION} · Passing &amp; Bablok 1983 · Bland &amp; Altman 1986 · CLSI EP09c · ${new Date().toLocaleDateString('tr-TR')}
   </div>
   </body></html>`;
 
@@ -11056,7 +11081,7 @@ function mentor_printReport() {
   ${approvalHTML}
   ${rawDataHTML}
   <div style="margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;font-size:10px;color:#94a3b8;text-align:center">
-    Generated by ClinVerify · JCGM 100:2008 (GUM) · Kallner A. Clin Chem Lab Med 2013;51:2249–51 · ${new Date().toLocaleDateString('tr-TR')}
+    Generated by ClinVerify v${CV_VERSION} · JCGM 100:2008 (GUM) · Kallner A. Clin Chem Lab Med 2013;51:2249–51 · ${new Date().toLocaleDateString('tr-TR')}
   </div>
   </body></html>`;
 
@@ -11603,7 +11628,7 @@ function inter_printReport() {
   ${commentHTML}
   ${approvalHTML}
   <div style="margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;font-size:10px;color:#94a3b8;text-align:center">
-    Generated by ClinVerify · Fraser CG 1999 · ${today}
+    Generated by ClinVerify v${CV_VERSION} · Fraser CG 1999 · ${today}
   </div>
   </body></html>`;
 
@@ -12265,13 +12290,23 @@ function openCombinedReportDialog() {
   const el = document.getElementById('cr-analyte');
   if (el && !el.value && analyte) el.value = analyte;
 
+  // Cover-page fields follow the project settings unless the user has typed
+  // something else here; nothing is pre-filled from a built-in default.
+  if (typeof cvProject !== 'undefined') {
+    [['cr-hospital', cvProject.lab], ['cr-dept', cvProject.department],
+     ['cr-analyst', cvProject.analyst], ['cr-plan', cvProject.planRef]].forEach(([id, v]) => {
+      const f = document.getElementById(id);
+      if (f && !f.value && v) f.value = v;
+    });
+  }
+
   const overlay = document.getElementById('combined-report-overlay');
   if (overlay) overlay.style.display = 'flex';
 }
 
 function generateCombinedReport() {
-  const hospital  = document.getElementById('cr-hospital')?.value || 'Helse Møre og Romsdal';
-  const dept      = document.getElementById('cr-dept')?.value || 'Medical Biochemistry';
+  const hospital  = document.getElementById('cr-hospital')?.value?.trim() || '';
+  const dept      = document.getElementById('cr-dept')?.value?.trim() || '';
   const analyte   = document.getElementById('cr-analyte')?.value || '—';
   const analyst   = document.getElementById('cr-analyst')?.value || '—';
   const plan      = document.getElementById('cr-plan')?.value || '—';
@@ -12307,6 +12342,10 @@ function generateCombinedReport() {
   if (document.getElementById('cr-inter')?.checked) {
     const html = getInterReportHTML();
     if (html) sections.push({ title: 'Inter-Instrument Comparison', html });
+  }
+  if (document.getElementById('cr-lin')?.checked) {
+    const html = getLinReportHTML();
+    if (html) sections.push({ title: 'Linearity / Analytical Measuring Interval — EP06-Ed2', html });
   }
   if (document.getElementById('cr-ri')?.checked) {
     const html = getRIReportHTML();
@@ -12346,6 +12385,8 @@ function generateCombinedReport() {
     table{border-collapse:collapse;width:100%}
     th,td{border:1px solid #e2e8f0;padding:5px 8px;font-size:11px}
     th{background:#f1f5f9}
+    /* header rows that carry the blue inline style keep it (the th rule above would otherwise paint over it) */
+    tr[style*="background:#1e40af"] th{background:#1e40af;color:#fff}
     .card{border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:12px}
     .ep09-stat-cell{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;display:inline-block;min-width:140px;margin:4px;vertical-align:top}
     .ep09-stat-val{font-size:16px;font-weight:700}
@@ -12392,7 +12433,7 @@ function generateCombinedReport() {
     /* Named @page with margin box for page numbers (print) */
     @page{
       margin:14mm 12mm 16mm 12mm;
-      @bottom-center{ content:"ClinVerify · Verification Report"; font-size:8pt; color:#94a3b8; }
+      @bottom-center{ content:"ClinVerify v${CV_VERSION} · Verification Report"; font-size:8pt; color:#94a3b8; }
       @bottom-right{ content:"Page " counter(page) " of " counter(pages); font-size:8pt; color:#64748b; }
     }
     @page :first{ @bottom-center{content:""} @bottom-right{content:""} }
@@ -12402,7 +12443,7 @@ function generateCombinedReport() {
   ${sectionsHTML}
   <div class="report-section" style="page-break-before:avoid">
     <div style="margin-top:20px;padding-top:12px;border-top:1px solid #e2e8f0;font-size:10px;color:#94a3b8;text-align:center">
-      ClinVerify · EP15-A3 · EP28-A3c · EP09c · EFLM Biological Variation Database
+      Generated by ClinVerify v${CV_VERSION} · CLSI EP15-A3 · EP09c · EP06-Ed2 · EP28-A3c · EFLM Biological Variation Database · ${today}
     </div>
   </div>
   <script>window.onload=()=>window.print()<\/script>
@@ -12419,8 +12460,8 @@ function buildCoverPage(hospital, dept, analyte, analyst, plan, date) {
     <!-- Header -->
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:60px">
       <div>
-        <div style="font-size:13px;font-weight:700;color:#1e40af">${hospital}</div>
-        <div style="font-size:11px;color:#64748b">${dept}</div>
+        ${hospital ? `<div style="font-size:13px;font-weight:700;color:#1e40af">${hospital}</div>` : ''}
+        ${dept ? `<div style="font-size:11px;color:#64748b">${dept}</div>` : ''}
       </div>
       <div style="font-size:11px;color:#94a3b8;text-align:right">${analyte}<br>${date}</div>
     </div>
@@ -12450,15 +12491,61 @@ function buildCoverPage(hospital, dept, analyte, analyst, plan, date) {
       </div>
     </div>
 
-    <!-- Footer logo area -->
+    <!-- Footer: institution (if given) and the software version -->
     <div style="margin-top:40px;text-align:center">
-      <div style="font-size:16px;font-weight:700;color:#1e40af">${hospital}</div>
-      <div style="font-size:12px;color:#64748b">${dept}</div>
+      ${hospital ? `<div style="font-size:16px;font-weight:700;color:#1e40af">${hospital}</div>` : ''}
+      ${dept ? `<div style="font-size:12px;color:#64748b">${dept}</div>` : ''}
+      <div style="font-size:10px;color:#94a3b8;margin-top:10px">Generated with ClinVerify v${CV_VERSION} · open-source verification software · https://doi.org/10.5281/zenodo.21255694</div>
     </div>
   </div>`;
 }
 
 // ── Module HTML extractors
+// The interpolation trace is written with the application's CSS variables; the
+// stand-alone report has none, so substitute literal colours.
+function crPlainTrace(html) {
+  if (!html) return '';
+  return html
+    .replace(/var\(--green-light\)/g, '#f0fdf4').replace(/var\(--green\)/g, '#16a34a')
+    .replace(/var\(--gray-400\)/g, '#94a3b8').replace(/var\(--gray-600\)/g, '#475569')
+    .replace(/var\(--gray-800\)/g, '#1e293b').replace(/var\(--amber\)/g, '#b45309')
+    .replace(/class="warn-box"/g, 'style="background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:8px 12px;font-size:11px;color:#92400e"');
+}
+
+function getLinReportHTML() {
+  // Same content as the module's own report (lin_printReport), without the
+  // page chrome, so the combined report and the single-module report agree.
+  if (typeof linLastRun === 'undefined' || !linLastRun) return null;
+  const rw = document.getElementById('lin-results-wrap');
+  if (!rw || !rw.innerHTML.trim()) return null;
+  const g = id => document.getElementById(id)?.value?.trim() || '';
+  const analyte = g('lin-analyte') || '—', unit = g('lin-unit'), instrument = g('lin-instrument'),
+        lab = g('lin-lab'), date = g('lin-date'), analyst = g('lin-analyst');
+  const studyName = linLastRun.studyType === 'verify'
+    ? 'Verification study (EP06-Ed2 Chapter 4) — weighted regression with multiplicity-adjusted confidence intervals'
+    : 'Validation study (EP06-Ed2 Chapter 3) — weighted regression, deviation vs allowable deviation from linearity';
+  const box = (l, v) => v ? `<div class="info-box"><div class="info-label">${l}</div><div class="info-value">${v}</div></div>` : '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = rw.innerHTML;
+  tmp.querySelectorAll('button, .btn, .btn-row, .no-print').forEach(el => el.remove());
+  const userComment = g('lin-comment');
+  const approveBtn = document.getElementById('lin-approve-btn');
+  const rejectBtn = document.getElementById('lin-reject-btn');
+  let approvalHTML = '';
+  if (approveBtn?.style.background?.includes('green'))
+    approvalHTML = '<div style="margin-top:10px;padding:8px 12px;background:#f0fdf4;border-radius:6px;border:1px solid #86efac;font-weight:700;color:#16a34a">✅ APPROVED</div>';
+  else if (rejectBtn?.style.background?.includes('red'))
+    approvalHTML = '<div style="margin-top:10px;padding:8px 12px;background:#fef2f2;border-radius:6px;border:1px solid #fca5a5;font-weight:700;color:#dc2626">❌ NOT APPROVED</div>';
+  const commentHTML = userComment
+    ? `<div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:10px 14px;margin-top:8px;font-size:12px;border-radius:0 6px 6px 0"><b>Laboratory Comment:</b> ${userComment}</div>` : '';
+  return `<div style="color:#64748b;font-size:11px;margin-bottom:10px">CLSI EP06-Ed2 (2020) · ${studyName}</div>
+    <div class="info-grid" style="grid-template-columns:repeat(3,1fr)">
+      ${box('Analyte', analyte)}${box('Unit', unit)}${box('Instrument', instrument)}
+      ${box('Laboratory', lab)}${box('Date', date)}${box('Analyst', analyst)}
+    </div>
+    ${tmp.innerHTML}${commentHTML}${approvalHTML}`;
+}
+
 function getM1ReportHTML() {
   const res = document.getElementById('m1-results');
   if (!res || res.classList.contains('hidden') || !res.innerHTML.trim()) return null;
@@ -12503,6 +12590,14 @@ function getM1ReportHTML() {
     let goalRows = '';
     if (!isNaN(otherCV)) goalRows += `<tr><td style="padding:5px 8px;border:1px solid #e2e8f0">Other / published target — source: ${otherSrc?cvEsc(otherSrc):'<span style="color:#dc2626">not stated</span>'}${otherActive?' <b style="color:#1e40af">&#9664; criterion applied</b>':''}</td><td style="padding:5px 8px;border:1px solid #e2e8f0;text-align:center">${otherCV.toFixed(2)}%</td><td style="padding:5px 8px;border:1px solid #e2e8f0;text-align:center;font-weight:700">${cv.toFixed(2)}%</td><td style="padding:5px 8px;border:1px solid #e2e8f0;text-align:center;color:${passO?'#16a34a':'#dc2626'};font-weight:700">${passO?'✅ PASS':'❌ FAIL'}</td></tr>`;
     if (!isNaN(sigmaFirma)) goalRows += `<tr><td style="padding:5px 8px;border:1px solid #e2e8f0">PI / Manufacturer (σR)${otherActive?'':' <b style="color:#1e40af">&#9664; criterion applied</b>'}</td><td style="padding:5px 8px;border:1px solid #e2e8f0;text-align:center">${sigmaFirma.toFixed(2)}%</td><td style="padding:5px 8px;border:1px solid #e2e8f0;text-align:center;font-weight:700">${cv.toFixed(2)}%</td><td style="padding:5px 8px;border:1px solid #e2e8f0;text-align:center;color:${passF?'#16a34a':'#dc2626'};font-weight:700">${passF?'✅ PASS':'❌ FAIL'}</td></tr>`;
+    // Upper verification limit (EP15-A3): F × σR with df = N − 1 and the Bonferroni
+    // adjustment for the number of levels — the same row the module's own report prints.
+    const uvlDf = N - 1;
+    const uvl = !isNaN(sigmaFirma) ? sigmaFirma * calcUVLfactor(uvlDf, m1Levels.length) : NaN;
+    const passUVL = !isNaN(uvl) && cv <= uvl;
+    if (!isNaN(uvl)) goalRows += `<tr><td style="padding:5px 8px;border:1px solid #e2e8f0">UVL (F×σR, EP15-A3)</td><td style="padding:5px 8px;border:1px solid #e2e8f0;text-align:center">${uvl.toFixed(2)}% <small style="color:#94a3b8">(F=${(uvl/sigmaFirma).toFixed(3)}, df=${uvlDf.toFixed(1)}, ${m1Levels.length} level${m1Levels.length>1?'s':''})</small></td><td style="padding:5px 8px;border:1px solid #e2e8f0;text-align:center;font-weight:700">${cv.toFixed(2)}%</td><td style="padding:5px 8px;border:1px solid #e2e8f0;text-align:center;color:${passUVL?'#16a34a':'#dc2626'};font-weight:700">${passUVL?'✅ PASS':'❌ FAIL'}</td></tr>`;
+    // How the claim was obtained from the package insert (interpolation or nearest point)
+    const piTrace = crPlainTrace(buildPITraceHTML(sigEl?.dataset?.piTrace, 'σR'));
     // Comment & Approval
     const cm = document.getElementById('m1-comment-'+id)?.value?.trim() || '';
     const appBtn = document.getElementById('m1-approve-'+id);
@@ -12524,6 +12619,7 @@ function getM1ReportHTML() {
       ${rawTable}
       ${ljSVG ? `<div class="lj-block" style="margin-bottom:12px"><div class="chart-label" style="font-size:11px;font-weight:600;color:#475569;margin-bottom:4px">📉 Levey-Jennings Chart</div>${ljSVG}</div>` : ''}
       ${goalRows ? `<table style="width:100%;border-collapse:collapse;margin-bottom:12px"><thead><tr style="background:#1e40af;color:#fff"><th style="padding:5px 8px;text-align:left">Target</th><th style="padding:5px 8px;text-align:center">Limit</th><th style="padding:5px 8px;text-align:center">CV%</th><th style="padding:5px 8px;text-align:center">Result</th></tr></thead><tbody>${goalRows}</tbody></table>` : ''}
+      ${piTrace ? `<div style="margin:-6px 0 12px">${piTrace}</div>` : ''}
       <div style="padding:8px 12px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0">
         <span style="font-size:12px;font-weight:700;color:${apColor}">${apText}</span>
       </div>
@@ -12595,6 +12691,7 @@ function getM2ReportHTML() {
             ` <small>(EP15-A3 limit ${R.limits.manual.toFixed(2)}%)</small>` : ''),
           R.pass.manual, R.governing==='manual');
     }
+    const piTrace2 = crPlainTrace(buildPITraceHTML(document.getElementById('m2-l'+id+'-goal-firma')?.dataset?.piTrace, 'σWL'));
     // Comment & Approval
     const cm = document.getElementById('m2-comment-'+id)?.value?.trim() || '';
     const appBtn = document.getElementById('m2-approve-'+id);
@@ -12617,6 +12714,7 @@ function getM2ReportHTML() {
       ${rawTable}
       ${ljSVG ? `<div class="lj-block" style="margin-bottom:12px"><div class="chart-label" style="font-size:11px;font-weight:600;color:#475569;margin-bottom:4px">📉 Levey-Jennings Chart</div>${ljSVG}</div>` : ''}
       ${goalRows ? `<table style="width:100%;border-collapse:collapse;margin-bottom:12px"><thead><tr style="background:#1e40af;color:#fff"><th style="padding:5px 8px;text-align:left">Target and its source</th><th style="padding:5px 8px;text-align:center">Limit applied</th><th style="padding:5px 8px;text-align:center">CV%</th><th style="padding:5px 8px;text-align:center">Result</th></tr></thead><tbody>${goalRows}</tbody></table>` : ''}
+      ${piTrace2 ? `<div style="margin:-6px 0 12px">${piTrace2}</div>` : ''}
       <div style="padding:8px 12px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0">
         <span style="font-size:12px;font-weight:700;color:${apColor}">${apText}</span>
       </div>
@@ -12636,85 +12734,24 @@ function getM2ReportHTML() {
 }
 
 function getBiasReportHTML(type) {
-  // type = 'iqc' or 'eqa'
-  const analyte = document.getElementById(type === 'iqc' ? 'bias-iqc-analyte' : 'eqa-analyte')?.value || '';
-  const unit = document.getElementById(type === 'iqc' ? 'bias-iqc-unit' : 'eqa-unit')?.value || '';
-
-  // Z-score mode for EQA
-  if (type === 'eqa' && eqaEvalMode === 'zscore') {
-    if (!eqaZscoreLevels.length) return null;
-    const material = document.getElementById('eqa-material')?.value || '';
-    let anyResult = false;
-    let levelsHTML = '';
-    eqaZscoreLevels.forEach(id => {
-      const lab = document.getElementById('eqa-zs-lab-' + id)?.value;
-      const mean = document.getElementById('eqa-zs-mean-' + id)?.value;
-      const sd = document.getElementById('eqa-zs-sd-' + id)?.value;
-      const mat = document.getElementById('eqa-zs-material-' + id)?.value || ('Level ' + id);
-      const resDiv = document.getElementById('eqa-zs-result-' + id);
-      if (!lab || !mean || !sd || !resDiv?.dataset?.z) return;
-      anyResult = true;
-      const z = parseFloat(resDiv.dataset.z);
-      const absZ = parseFloat(resDiv.dataset.absZ);
-      const verdict = resDiv.dataset.verdict;
-      const bias = resDiv.dataset.bias;
-      const comment = document.getElementById('eqa-zs-comment-' + id)?.value?.trim() || '';
-      let bgColor, borderColor, textColor, icon;
-      if (absZ <= 2.0) { bgColor='#f0fdf4'; borderColor='#86efac'; textColor='#16a34a'; icon='✅'; }
-      else if (absZ <= 3.0) { bgColor='#fffbeb'; borderColor='#fcd34d'; textColor='#d97706'; icon='⚠️'; }
-      else { bgColor='#fef2f2'; borderColor='#fca5a5'; textColor='#dc2626'; icon='❌'; }
-      levelsHTML += `
-        <div style="margin-bottom:14px;padding:12px;border:1px solid #e2e8f0;border-radius:8px">
-          <div style="font-size:12px;font-weight:700;color:#334155;margin-bottom:8px">${mat}</div>
-          <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px">
-            <thead><tr style="background:#1e40af;color:#fff">
-              <th style="padding:5px 10px">Lab Result</th>
-              <th style="padding:5px 10px">Group Mean</th>
-              <th style="padding:5px 10px">Group SD</th>
-              <th style="padding:5px 10px">Z-Score</th>
-              <th style="padding:5px 10px">Bias%</th>
-            </tr></thead>
-            <tbody><tr style="text-align:center">
-              <td style="padding:5px 10px;border:1px solid #e2e8f0">${parseFloat(lab).toFixed(3)}</td>
-              <td style="padding:5px 10px;border:1px solid #e2e8f0">${parseFloat(mean).toFixed(3)}</td>
-              <td style="padding:5px 10px;border:1px solid #e2e8f0">${parseFloat(sd).toFixed(3)}</td>
-              <td style="padding:5px 10px;border:1px solid #e2e8f0;font-weight:700;color:#1e40af">${z.toFixed(2)}</td>
-              <td style="padding:5px 10px;border:1px solid #e2e8f0">${bias}%</td>
-            </tr></tbody>
-          </table>
-          <div style="padding:8px 14px;border-radius:6px;background:${bgColor};border:1px solid ${borderColor};font-weight:700;color:${textColor}">
-            ${icon} ${verdict} — |Z| = ${absZ.toFixed(2)} ${absZ<=2?'≤ 2.0':absZ<=3?'≤ 3.0 (borderline)':'> 3.0'}
-          </div>
-          ${comment ? `<div style="margin-top:6px;background:#f0fdf4;border-left:4px solid #16a34a;padding:8px 12px;font-size:11px;border-radius:0 6px 6px 0"><b>Comment:</b> ${comment}</div>` : ''}
-        </div>`;
-    });
-    if (!anyResult) return null;
-    return `<div class="section-content">
-      <div class="info-grid" style="margin-bottom:12px">
-        <div class="info-box"><div class="info-label">Analyte</div><div class="info-value">${analyte}</div></div>
-        <div class="info-box"><div class="info-label">Unit</div><div class="info-value">${unit}</div></div>
-        <div class="info-box"><div class="info-label">EQA Program</div><div class="info-value">${material}</div></div>
-        <div class="info-box"><div class="info-label">Method</div><div class="info-value">Z-Score (ECAT/DKK)</div></div>
-        <div class="info-box"><div class="info-label">Criteria</div><div class="info-value">|Z| ≤ 2.0 PASS | ≤ 3.0 WARNING | > 3.0 FAIL</div></div>
-      </div>
-      ${levelsHTML}
-    </div>`;
+  // type = 'iqc' or 'eqa'. Built from the same body as the module's own report
+  // (buildBiasReportBody) so the two never disagree. For EQA both evaluation
+  // modes are reported when both hold results: per cent bias against the
+  // assigned value, and the Z-score the programme itself reports.
+  if (typeof buildBiasReportBody !== 'function') return null;
+  const head = (t) => `<div style="font-size:11px;color:#64748b;margin:0 0 10px">${t}</div>`;
+  if (type === 'iqc') {
+    const B = buildBiasReportBody('iqc');
+    if (!B.hasRows) return null;
+    return `<div class="section-content">${head('CLSI EP15-A3, Chapter 3 · Bias against internal quality control (assigned values)')}${B.infoHTML}${B.tableHTML}</div>`;
   }
-
-  // Standard % bias mode
-  const resultsEl = type === 'iqc'
-    ? document.getElementById('bias-iqc-results-wrap') || document.getElementById('biasIQC-results')
-    : document.getElementById('bias-eqa-results-wrap') || document.getElementById('biasEQA-results');
-  if (!resultsEl || !resultsEl.innerHTML.trim()) return null;
-  return `<div class="section-content">
-    <div class="info-grid" style="margin-bottom:12px">
-      <div class="info-box"><div class="info-label">Analyte</div><div class="info-value">${analyte}</div></div>
-      <div class="info-box"><div class="info-label">Unit</div><div class="info-value">${unit}</div></div>
-      <div class="info-box"><div class="info-label">Method</div><div class="info-value">${type.toUpperCase()}</div></div>
-      <div class="info-box"><div class="info-label">Standard</div><div class="info-value">EP15-A3</div></div>
-    </div>
-    ${resultsEl.innerHTML}
-  </div>`;
+  const parts = [];
+  const P = buildBiasReportBody('eqa', 'bias');
+  if (P.hasRows) parts.push(head('CLSI EP15-A3, Chapter 3 · Per cent bias against the assigned value') + P.infoHTML + P.tableHTML);
+  const Z = buildBiasReportBody('eqa', 'zscore');
+  if (Z.hasRows) parts.push(head('Z-score as reported by the programme, from its peer mean and SD · |Z| ≤ 2.0 pass, ≤ 3.0 warning, > 3.0 fail') + (P.hasRows ? '' : Z.infoHTML) + Z.tableHTML);
+  if (!parts.length) return null;
+  return `<div class="section-content">${parts.join('<div style="height:18px"></div>')}</div>`;
 }
 
 function getEP09ReportHTML() {
@@ -13089,12 +13126,12 @@ function getRIReportHTML() {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
       <div>
         <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">HOSPITAL</label>
-        <input type="text" id="cr-hospital" value="Helse Møre og Romsdal"
+        <input type="text" id="cr-hospital" placeholder="Laboratory / institution (optional)"
           style="width:100%;border:1px solid #e2e8f0;border-radius:6px;padding:7px 10px;font-size:13px">
       </div>
       <div>
         <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">DEPARTMENT</label>
-        <input type="text" id="cr-dept" value="Medical Biochemistry"
+        <input type="text" id="cr-dept" placeholder="Department (optional)"
           style="width:100%;border:1px solid #e2e8f0;border-radius:6px;padding:7px 10px;font-size:13px">
       </div>
       <div>
@@ -13150,6 +13187,9 @@ function getRIReportHTML() {
       </label>
       <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:6px 10px;border:1px solid #e2e8f0;border-radius:6px">
         <input type="checkbox" id="cr-inter"> Inter-Instrument Comparison
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:6px 10px;border:1px solid #e2e8f0;border-radius:6px">
+        <input type="checkbox" id="cr-lin"> Linearity / AMR (EP06-Ed2)
       </label>
       <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:6px 10px;border:1px solid #e2e8f0;border-radius:6px">
         <input type="checkbox" id="cr-ri"> Reference Interval Verification
@@ -13843,7 +13883,7 @@ const linBodyHTML = `
     <div class="form-grid">
       <div class="form-group"><label>Laboratory</label><input type="text" id="lin-lab" placeholder="e.g. HMR Laboratory"></div>
       <div class="form-group"><label>Date</label><input type="date" id="lin-date"></div>
-      <div class="form-group"><label>Analyte</label><input type="text" id="lin-analyte" placeholder="e.g. Glucose, Creatinine" oninput="lin_recalcAllowable()" autocomplete="off"></div>
+      <div class="form-group"><label>Analyte</label><input type="text" id="lin-analyte" placeholder="e.g. Glucose, Creatinine" oninput="lin_recalcAllowable();syncAnalyteFromSource('lin')" autocomplete="off"></div>
       <div class="form-group"><label>Unit</label><input type="text" id="lin-unit" placeholder="e.g. mmol/L, µmol/L" oninput="lin_recalcAllowable()"></div>
       <div class="form-group"><label>Instrument</label><input type="text" id="lin-instrument" placeholder="e.g. Roche cobas c703"></div>
       <div class="form-group"><label>Analyst</label><input type="text" id="lin-analyst" placeholder="Full name"></div>
@@ -14025,6 +14065,11 @@ function initLinearityPanel() {
   const inner = panel ? panel.querySelector('.lin-inner') : null;
   if (inner) inner.innerHTML = linBodyHTML;
   lin_init();
+  // The panel is built on first visit; pick up the analyte, unit and instrument
+  // already entered in another module so the name is the same everywhere.
+  const src = ['m1','m2','bias-iqc','eqa','ep09','mentor','inter','ri']
+    .find(m => document.getElementById(m + '-analyte')?.value?.trim());
+  if (src) syncAnalyteFromSource(src);
 }
 
 function lin_init() {
@@ -14134,7 +14179,7 @@ function lin_parsePaste() {
 // panel entered in ClinVerify and the file handed to another program cannot
 // drift apart.
 const LIN_CREATININE_PANEL = {
-  analyte: 'Creatinin',
+  analyte: 'Creatinine',
   unit: 'µmol/L',
   instrument: 'Roche cobas c703-1',
   lowAssigned: 26,
@@ -14919,7 +14964,7 @@ function lin_printReport() {
     '</div>' +
     tmp.innerHTML + commentHTML + approvalHTML +
     '<div style="margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;font-size:10px;color:#94a3b8;text-align:center">' +
-    'Generated by ClinVerify · CLSI EP06-Ed2 (2020) · ' + new Date().toLocaleDateString('tr-TR') + '</div></body></html>';
+    'Generated by ClinVerify v' + CV_VERSION + ' · CLSI EP06-Ed2 (2020) · ' + new Date().toLocaleDateString('tr-TR') + '</div></body></html>';
 
   const iframe = document.getElementById('report-iframe');
   const printBtn = document.getElementById('print-btn');
