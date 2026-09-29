@@ -6,14 +6,15 @@ authors:
   - family-names: Kilinckaya
     given-names: Muhammed F.
     affiliation: "Helse Møre og Romsdal (HMR), Norway"
+    orcid: "https://orcid.org/0000-0002-0815-5467"
 license: MIT
-version: 1.0.0
-date-released: "2026-07-08"
-doi: 10.5281/zenodo.21255695
+version: 1.2.2
+date-released: "2026-09-29"
+doi: 10.5281/zenodo.21255694
 identifiers:
   - type: doi
-    value: 10.5281/zenodo.21255695
-    description: "Archived snapshot of version 1.0.0"
+    value: 10.5281/zenodo.21255694
+    description: "Concept DOI (all versions; resolves to the latest)"
 repository-code: "https://github.com/mfkilinckaya-svg/ClinVerify"
 keywords:
   - clinical chemistry
