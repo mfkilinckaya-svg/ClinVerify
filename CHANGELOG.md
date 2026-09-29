@@ -3,6 +3,46 @@
 All notable changes to ClinVerify are recorded here. Versions follow semantic
 versioning. Each release is archived on Zenodo and carries its own version DOI.
 
+## [1.2.2] — 2026-09-29
+
+Corrects the biological variation lookup. Results produced with 1.2.1 for the
+creatinine demonstration dataset, and every number reported in the manuscript,
+are unchanged: creatinine resolved to the correct entry in both versions.
+
+### Fixed
+
+- **Biological variation followed the analyte name only, not the sample type.**
+  `resolveEFLMKey()` chose the EFLM entry from the name and unit; the sample
+  type selected in the module was used for the manufacturer claims but never
+  reached the biological variation lookup. Selecting *Urine* therefore still
+  returned the serum entry, and the urine entries could be reached only by
+  typing their key (`Kreatinin_Urin`). The sample type is now passed to all
+  nine lookups: *Urine* returns the urine entry (`Albümin_Urin`,
+  `Kreatinin_Urin`, … eleven analytes), blood sample types return the serum
+  entry, and a sample type with no entry (urine ALT, CSF, body fluids) returns
+  none — the module says so and clears the previous values instead of leaving
+  a serum specification in place.
+- **Three English serum names carried urine values.** The entries `Albumin`,
+  `Cl` and `Phosphorus` held the urine CVI/CVG (35/55, 37/52, 56.7/75.8)
+  instead of the serum values (2.3/4.3, 1.0/1.3, 7.7/10.7). Anyone entering
+  *Albumin*, *Chloride*, *Cl*, *Klor* or *Phosphorus* received a desirable
+  imprecision specification of 17.5 %, 18.5 % or 28.4 % in place of 1.15 %,
+  0.5 % or 3.85 %. The entries now hold the serum values.
+
+### Added
+
+- **Self-check of the lookup** (About → self-checks): 80 lookups verifying
+  that alternative names of one analyte carry identical values and that
+  each serum/urine pair resolves to the entry of the selected sample type.
+- Analyte names ending in *Urin*, *Urine* or *Idrar* ("Albumin Urin") resolve
+  to the urine entry.
+
+### Unchanged
+
+A regression run over every analyte name and synonym in the databases × eight
+units (5 016 lookups) with the serum sample type differs from 1.2.1 only for
+the three corrected analytes.
+
 ## [1.2.0] — 2026-08-31
 
 The release the manuscript is pinned to. It corrects three defects that affected
