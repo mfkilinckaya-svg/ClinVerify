@@ -1,0 +1,31 @@
+# Keeps index.html (served by GitHub Pages) identical to ClinVerify.html.
+# Runs whenever ClinVerify.html changes on main; commits index.html only if it differs.
+name: Sync index.html
+
+on:
+  push:
+    branches: [main]
+    paths: [ClinVerify.html]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy ClinVerify.html to index.html
+        run: |
+          if cmp -s ClinVerify.html index.html; then
+            echo "index.html is already up to date."
+            exit 0
+          fi
+          cp ClinVerify.html index.html
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898699+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Sync index.html with ClinVerify.html"
+          git push
